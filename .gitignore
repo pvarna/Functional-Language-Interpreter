@@ -86,7 +86,7 @@ _deps
 # Ignore all local history of files
 .history
 .ionide
-
+*.json
 # Support for Project snippet scope
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,linux,visualstudiocode,cmake
