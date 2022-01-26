@@ -112,7 +112,7 @@ void Lexer::functionName(std::string::iterator& it)
 {
     std::string functionName;
 
-    while (it != this->text.end() && isalpha(*it))
+    while (it != this->text.end() && (isalpha(*it) || isdigit(*it)))
     {
         functionName += *it;
         ++it;
