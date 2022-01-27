@@ -1,12 +1,12 @@
 #include <cmath>
 #include <iostream>
 #include "lexer.h"
-#include "../Exceptions/illegalCharacterException.h"
-#include "../Exceptions/missingCharacterException.h"
-#include "Tokens/fractionalNumberToken.h"
-#include "Tokens/wholeNumberToken.h"
-#include "Tokens/functionNameToken.h"
-#include "Tokens/argumentToken.h"
+#include "illegalCharacterException.h"
+#include "missingCharacterException.h"
+#include "fractionalNumberToken.h"
+#include "wholeNumberToken.h"
+#include "functionNameToken.h"
+#include "argumentToken.h"
 
 const double EPS = 0.00001;
 
@@ -139,7 +139,12 @@ void Lexer::functionName(std::string::iterator& it)
 void Lexer::dash(std::string::iterator& it)
 {
     ++it;
-    if (it == this->text.end() || (*it != '>' && !isdigit(*it)))
+    if (it == this->text.end())
+    {
+        this->deallocateTokens();
+        throw MissingCharacterException('>', this->text, it - this->text.begin());
+    }
+    if (*it != '>' && !isdigit(*it))
     {
         this->deallocateTokens();
         throw IllegalCharacterException(*it, this->text, it - this->text.begin());
