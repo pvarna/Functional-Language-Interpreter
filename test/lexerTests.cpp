@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include "catch2/catch.hpp"
-#include "../src/Lexer/lexer.h"
+#include "lexer.h"
 
 void deallocateTokens(std::vector<Token*>& tokens)
 {
