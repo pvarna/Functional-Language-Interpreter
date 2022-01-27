@@ -1,6 +1,6 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/c++,linux,visualstudiocode,cmake
-# Edit at https://www.toptal.com/developers/gitignore?templates=c++,linux,visualstudiocode,cmake
+# Created by https://www.toptal.com/developers/gitignore/api/cmake,visualstudiocode,c++,linux
+# Edit at https://www.toptal.com/developers/gitignore?templates=cmake,visualstudiocode,c++,linux
 
 ### C++ ###
 # Prerequisites
@@ -86,7 +86,9 @@ _deps
 # Ignore all local history of files
 .history
 .ionide
-*.json
+
+build/
+
 # Support for Project snippet scope
 
-# End of https://www.toptal.com/developers/gitignore/api/c++,linux,visualstudiocode,cmake
+# End of https://www.toptal.com/developers/gitignore/api/cmake,visualstudiocode,c++,linux
