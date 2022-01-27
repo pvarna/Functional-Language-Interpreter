@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <stack>
-#include "Tokens/token.h"
+#include "token.h"
 
 class Lexer
 {
