@@ -11,5 +11,7 @@ private:
 public:
     Token(const TokenType& type);
 
+    TokenType getType() const;
+
     virtual std::string toString() const;
 };

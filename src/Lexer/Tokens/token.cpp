@@ -5,6 +5,11 @@ Token::Token(const TokenType& type)
     this->type = type;
 }
 
+TokenType Token::getType() const
+{
+    return this->type;
+}
+
 std::string Token::toString() const
 {
     switch (this->type)
