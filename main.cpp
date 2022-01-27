@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstring>
-#include "Lexer/lexer.h"
-#include "Exceptions/illegalCharacterException.h"
+#include "lexer.h"
+#include "illegalCharacterException.h"
 
 int main ()
 {
