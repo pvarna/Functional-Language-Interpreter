@@ -2,12 +2,10 @@
 
 #include "token.h"
 
-class FractionalNumberToken : public Token
+struct FractionalNumberToken : public Token
 {
-private:
     double value;
 
-public:
     FractionalNumberToken(const double value);
 
     virtual std::string toString() const override;
