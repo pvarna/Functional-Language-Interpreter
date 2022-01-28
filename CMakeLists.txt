@@ -12,7 +12,12 @@ add_library(ListFunc src/Exceptions/illegalCharacterException.cpp
                      src/Lexer/Tokens/functionNameToken.cpp
                      src/Lexer/Tokens/token.cpp
                      src/Lexer/Tokens/wholeNumberToken.cpp
-                     src/Parser/ASTNode.cpp)
+                     src/Parser/Nodes/ASTLeafNode.cpp
+                     src/Parser/Nodes/ASTUnaryFunctionNode.cpp
+                     src/Parser/Nodes/ASTBinaryFunctionNode.cpp
+                     src/Parser/Nodes/ASTTernaryFunctionNode.cpp
+                     src/Parser/Nodes/ASTUserFunctionNode.cpp
+                     src/Parser/parser.cpp)
                      
 target_include_directories(ListFunc PUBLIC headers/)
 
@@ -21,6 +26,9 @@ target_link_libraries(ConsoleApp ListFunc)
 
 add_executable(Tests test/lexerTests.cpp)
 target_link_libraries(Tests ListFunc)
+
+add_executable(Proba test.cpp)
+target_link_libraries(Proba ListFunc)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
