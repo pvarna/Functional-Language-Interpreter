@@ -1,10 +1,10 @@
-#include "ASTNode.h"
+#include "ASTLeafNode.h"
 #include "argumentToken.h"
 #include "functionNameToken.h"
 #include "fractionalNumberToken.h"
 #include "wholeNumberToken.h"
 
-void ASTNode::copy(const Token* token)
+void ASTLeafNode::copyToken(const Token* token)
 {
     if (!token)
     {
@@ -40,39 +40,38 @@ void ASTNode::copy(const Token* token)
     }
 }
 
-void ASTNode::deallocate()
+void ASTLeafNode::deallocateToken()
 {
     delete this->token;
-    this->token = nullptr;
 }
 
-ASTNode::ASTNode(const Token* token)
+ASTLeafNode::ASTLeafNode(const Token* token)
 {
-    this->copy(token);
+    this->token = token;
 }
 
-ASTNode::ASTNode(const ASTNode& other)
+ASTLeafNode::ASTLeafNode(const ASTLeafNode& other)
 {
-    this->copy(other.token);
+    this->copyToken(other.token);
 }
 
-ASTNode& ASTNode::operator = (const ASTNode& other)
+ASTLeafNode& ASTLeafNode::operator = (const ASTLeafNode& other)
 {
     if (this != &other)
     {
-        this->deallocate();
-        this->copy(other.token);
+        this->deallocateToken();
+        this->copyToken(other.token);
     }
 
     return *this;
 }
 
-ASTNode::~ASTNode()
+ASTLeafNode::~ASTLeafNode()
 {
-    this->deallocate();
+    this->deallocateToken();
 }
 
-std::string ASTNode::toString() const
+std::string ASTLeafNode::toString() const
 {
     return this->token->toString();
 }
