@@ -2,7 +2,7 @@
 
 #include "token.h"
 
-struct ASTLeafNode
+struct ASTNode
 {
 private:
     void copyToken(const Token* token);
@@ -11,10 +11,10 @@ private:
 public:
     const Token* token;
 
-    ASTLeafNode(const Token* token);
-    ASTLeafNode(const ASTLeafNode& other);
-    ASTLeafNode& operator = (const ASTLeafNode& other);
-    ~ASTLeafNode();
+    ASTNode(const Token* token);
+    ASTNode(const ASTNode& other);
+    ASTNode& operator = (const ASTNode& other);
+    ~ASTNode();
 
     virtual std::string toString() const;
 };

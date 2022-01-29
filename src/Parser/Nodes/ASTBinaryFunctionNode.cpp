@@ -2,8 +2,8 @@
 
 void ASTBinaryFunctionNode::copyArguments(const ASTBinaryFunctionNode& other)
 {
-    this->firstArgument = new ASTLeafNode(*other.firstArgument);
-    this->secondArgument = new ASTLeafNode(*other.secondArgument);
+    this->firstArgument = new ASTNode(*other.firstArgument);
+    this->secondArgument = new ASTNode(*other.secondArgument);
 }
 
 void ASTBinaryFunctionNode::deallocateArguments()
@@ -12,16 +12,16 @@ void ASTBinaryFunctionNode::deallocateArguments()
     delete this->secondArgument;
 }
 
-ASTBinaryFunctionNode::ASTBinaryFunctionNode(const Token* token, const ASTLeafNode* firstArgument,
-                                                                 const ASTLeafNode* secondArgument)
-    : ASTLeafNode(token)
+ASTBinaryFunctionNode::ASTBinaryFunctionNode(const Token* token, const ASTNode* firstArgument,
+                                                                 const ASTNode* secondArgument)
+    : ASTNode(token)
 {
     this->firstArgument = firstArgument;
     this->secondArgument = secondArgument;
 }
 
 ASTBinaryFunctionNode::ASTBinaryFunctionNode(const ASTBinaryFunctionNode& other)
-    : ASTLeafNode(token)
+    : ASTNode(token)
 {
     this->copyArguments(other);
 }
@@ -31,7 +31,7 @@ ASTBinaryFunctionNode& ASTBinaryFunctionNode::operator = (const ASTBinaryFunctio
     if (this != &other)
     {
         this->deallocateArguments();
-        ASTLeafNode::operator=(other);
+        ASTNode::operator=(other);
         this->copyArguments(other);
     }
 

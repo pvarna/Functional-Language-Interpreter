@@ -1,20 +1,20 @@
 #pragma once
 
-#include "ASTLeafNode.h"
+#include "ASTNode.h"
 
-struct ASTTernaryFunctionNode : public ASTLeafNode
+struct ASTTernaryFunctionNode : public ASTNode
 {
 private:
     void copyArguments(const ASTTernaryFunctionNode& other);
     void deallocateArguments();
 
 public:
-    const ASTLeafNode* firstArgument;
-    const ASTLeafNode* secondArgument;
-    const ASTLeafNode* thirdArgument;
+    const ASTNode* firstArgument;
+    const ASTNode* secondArgument;
+    const ASTNode* thirdArgument;
 
-    ASTTernaryFunctionNode(const Token* token, const ASTLeafNode* firstArgument,
-                        const ASTLeafNode* secondArgument, const ASTLeafNode* thirdArgument);
+    ASTTernaryFunctionNode(const Token* token, const ASTNode* firstArgument,
+                        const ASTNode* secondArgument, const ASTNode* thirdArgument);
     ASTTernaryFunctionNode(const ASTTernaryFunctionNode& other);
     ASTTernaryFunctionNode& operator = (const ASTTernaryFunctionNode& other);
     ~ASTTernaryFunctionNode();

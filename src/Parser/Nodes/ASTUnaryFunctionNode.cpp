@@ -2,7 +2,7 @@
 
 void ASTUnaryFunctionNode::copyArgument(const ASTUnaryFunctionNode& other)
 {
-    this->argument = new ASTLeafNode(*other.argument);
+    this->argument = new ASTNode(*other.argument);
 }
 
 void ASTUnaryFunctionNode::deallocateArgument()
@@ -10,14 +10,14 @@ void ASTUnaryFunctionNode::deallocateArgument()
     delete this->argument;
 }
 
-ASTUnaryFunctionNode::ASTUnaryFunctionNode(const Token* token, const ASTLeafNode* argument)
-    : ASTLeafNode(token)
+ASTUnaryFunctionNode::ASTUnaryFunctionNode(const Token* token, const ASTNode* argument)
+    : ASTNode(token)
 {
     this->argument = argument;
 }
 
 ASTUnaryFunctionNode::ASTUnaryFunctionNode(const ASTUnaryFunctionNode& other)
-    : ASTLeafNode(token)
+    : ASTNode(token)
 {
     this->copyArgument(other);
 }
@@ -27,7 +27,7 @@ ASTUnaryFunctionNode& ASTUnaryFunctionNode::operator = (const ASTUnaryFunctionNo
     if (this != &other)
     {
         this->deallocateArgument();
-        ASTLeafNode::operator=(other);
+        ASTNode::operator=(other);
         this->copyArgument(other);
     }
 
