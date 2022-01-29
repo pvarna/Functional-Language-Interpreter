@@ -2,6 +2,7 @@
 #include <cstring>
 #include "lexer.h"
 #include "illegalCharacterException.h"
+#include "parser.h"
 
 int main ()
 {
@@ -27,12 +28,17 @@ int main ()
         std::cout << token->toString() << std::endl;
     }
 
-    for (Token* token : tokens)
-    {
-        delete token;
-    }
+    Parser parser(str, tokens);
+    ASTNode* result = parser.parse();
 
-    tokens.clear();
+    std::cout << result->toString() << std::endl;
+
+    // for (Token* token : tokens)
+    // {
+    //     delete token;
+    // }
+
+    // tokens.clear();
 
     return 0;
 }
