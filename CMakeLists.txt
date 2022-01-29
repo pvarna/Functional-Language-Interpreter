@@ -6,17 +6,20 @@ enable_testing()
 
 add_library(ListFunc src/Exceptions/illegalCharacterException.cpp
                      src/Exceptions/missingCharacterException.cpp
+                     src/Exceptions/illegalSyntaxException.cpp
                      src/Lexer/lexer.cpp
                      src/Lexer/Tokens/argumentToken.cpp
                      src/Lexer/Tokens/fractionalNumberToken.cpp
                      src/Lexer/Tokens/functionNameToken.cpp
                      src/Lexer/Tokens/token.cpp
                      src/Lexer/Tokens/wholeNumberToken.cpp
-                     src/Parser/Nodes/ASTLeafNode.cpp
+                     src/Parser/Nodes/ASTNode.cpp
                      src/Parser/Nodes/ASTUnaryFunctionNode.cpp
                      src/Parser/Nodes/ASTBinaryFunctionNode.cpp
                      src/Parser/Nodes/ASTTernaryFunctionNode.cpp
+                     src/Parser/Nodes/ASTN_aryFunctionNode.cpp
                      src/Parser/Nodes/ASTUserFunctionNode.cpp
+                     src/Parser/Nodes/ASTListNode.cpp
                      src/Parser/parser.cpp)
                      
 target_include_directories(ListFunc PUBLIC headers/)
