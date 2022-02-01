@@ -10,7 +10,7 @@ void ASTNode::copyToken(const Token* token)
     {
         this->token = nullptr;
     }
-    if (token->type == TokenType::ARGUMENT)
+    else if (token->type == TokenType::ARGUMENT)
     {
         const ArgumentToken* argumentToken = dynamic_cast<const ArgumentToken*>(token);
 

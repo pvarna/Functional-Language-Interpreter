@@ -1,44 +1,34 @@
 #include "ASTUserFunctionNode.h"
 
-void ASTUserFunctionNode::copyDefinitionAndArguments(const ASTUserFunctionNode& other)
+void ASTUserFunctionNode::copyDefinition(const ASTUserFunctionNode& other)
 {
     this->definition = new ASTNode(*other.definition);
-    for (const ASTNode* current : other.arguments)
-    {
-        this->arguments.push_back(new ASTNode(*current));
-    }
 }
 
-void ASTUserFunctionNode::deallocateDefinitionAndArguments()
+void ASTUserFunctionNode::deallocateDefinition()
 {
     delete this->definition;
-    for (const ASTNode* current : this->arguments)
-    {
-        delete current;
-    }
 }
 
-ASTUserFunctionNode::ASTUserFunctionNode(const Token* token, const ASTNode* definition,
-                         const std::vector<const ASTNode*>& arguments)
+ASTUserFunctionNode::ASTUserFunctionNode(const Token* token, const ASTNode* definition)
     : ASTNode(token)
 {
     this->definition = definition;
-    this->arguments = arguments;
 }
 
 ASTUserFunctionNode::ASTUserFunctionNode(const ASTUserFunctionNode& other)
-    : ASTNode(token)
+    : ASTNode(other)
 {
-    this->copyDefinitionAndArguments(other);
+    this->copyDefinition(other);
 }
 
 ASTUserFunctionNode& ASTUserFunctionNode::operator = (const ASTUserFunctionNode& other)
 {
     if (this != &other)
     {
-        this->deallocateDefinitionAndArguments();
+        this->deallocateDefinition();
         ASTNode::operator=(other);
-        this->copyDefinitionAndArguments(other);
+        this->copyDefinition(other);
     }
 
     return *this;
@@ -46,18 +36,13 @@ ASTUserFunctionNode& ASTUserFunctionNode::operator = (const ASTUserFunctionNode&
 
 ASTUserFunctionNode::~ASTUserFunctionNode()
 {
-    this->deallocateDefinitionAndArguments();
+    this->deallocateDefinition();
 }
 
 std::string ASTUserFunctionNode::toString() const
 {
     std::string result = "(";
-    result += this->token->toString() + " " + this->definition->toString();
-    for (const ASTNode* current : this->arguments)
-    {
-        result += " " + current->toString();
-    }
-    result += ")";
+    result += this->token->toString() + " " + this->definition->toString() + ")";
 
     return result;
 }

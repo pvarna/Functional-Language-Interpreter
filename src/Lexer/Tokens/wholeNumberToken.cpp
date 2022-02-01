@@ -1,4 +1,5 @@
 #include "wholeNumberToken.h"
+#include "stringConverter.h"
 
 WholeNumberToken::WholeNumberToken(const int value) : Token(TokenType::WHOLE_NUMBER)
 {
@@ -9,6 +10,6 @@ std::string WholeNumberToken::toString() const
 {
     std::string result = Token::toString();
     result += ": ";
-    result += std::to_string(this->value);
+    result += StringConverter::intToString(this->value);
     return result;
 }

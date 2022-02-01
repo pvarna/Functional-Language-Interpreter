@@ -268,7 +268,7 @@ void Lexer::argument(std::string::iterator& it)
     --it;
 }
 
-std::vector<Token*> Lexer::getTokens()
+std::vector<Token*> Lexer::tokenize()
 {
     for (std::string::iterator it = this->text.begin(); it != this->text.end(); ++it)
     {

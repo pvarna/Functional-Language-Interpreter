@@ -123,7 +123,6 @@ ASTNode* Parser::function()
             (this->tokens[this->currentIndex]->type != TokenType::COMMA &&
              this->tokens[this->currentIndex]->type != TokenType::CLOSING_ROUND_BRACKET))
         {
-            std::cout << this->currentIndex << std::endl;
             throw IllegalSyntaxException("Expected a comma or )", this->text);
         }
 
@@ -207,7 +206,7 @@ ASTNode* Parser::parse()
                 throw IllegalSyntaxException("Expected a number, list or function name", this->text);
             }
 
-            return new ASTUserFunctionNode(functionName, definition, {});
+            return new ASTUserFunctionNode(functionName, definition);
         }
     }
 

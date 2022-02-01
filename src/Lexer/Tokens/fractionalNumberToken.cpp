@@ -1,4 +1,5 @@
 #include "fractionalNumberToken.h"
+#include "stringConverter.h"
 
 FractionalNumberToken::FractionalNumberToken(const double value) : Token(TokenType::FRACTIONAL_NUMBER)
 {
@@ -9,10 +10,6 @@ std::string FractionalNumberToken::toString() const
 {
     std::string result = Token::toString();
     result += ": ";
-    result += std::to_string(this->value);
-    while (result.back() == '0')
-    {
-        result.pop_back();
-    }
+    result += StringConverter::doubleToString(this->value);
     return result;
 }

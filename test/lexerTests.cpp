@@ -19,7 +19,7 @@ TEST_CASE("Check for valid single tokens")
         SECTION("Positive whole number")
         {
             Lexer positive("5");
-            std::vector<Token*> tokens = positive.getTokens();
+            std::vector<Token*> tokens = positive.tokenize();
             REQUIRE(tokens.size() == 1);
             REQUIRE(tokens[0]->toString() == "WHOLE_NUMBER: 5");
 
@@ -29,7 +29,7 @@ TEST_CASE("Check for valid single tokens")
         SECTION("Negative whole number")
         {
             Lexer negative("-3");
-            std::vector<Token*> tokens = negative.getTokens();
+            std::vector<Token*> tokens = negative.tokenize();
             REQUIRE(tokens.size() == 1);
             REQUIRE(tokens[0]->toString() == "WHOLE_NUMBER: -3");
 
@@ -39,7 +39,7 @@ TEST_CASE("Check for valid single tokens")
         SECTION("Zero")
         {
             Lexer zero("0");
-            std::vector<Token*> tokens = zero.getTokens();
+            std::vector<Token*> tokens = zero.tokenize();
             REQUIRE(tokens.size() == 1);
             REQUIRE(tokens[0]->toString() == "WHOLE_NUMBER: 0");
 
@@ -49,7 +49,7 @@ TEST_CASE("Check for valid single tokens")
         SECTION("Number with zero decimal part")
         {
             Lexer zeroDecimal("12.0000");
-            std::vector<Token*> tokens = zeroDecimal.getTokens();
+            std::vector<Token*> tokens = zeroDecimal.tokenize();
             REQUIRE(tokens.size() == 1);
             REQUIRE(tokens[0]->toString() == "WHOLE_NUMBER: 12");
 
@@ -62,7 +62,7 @@ TEST_CASE("Check for valid single tokens")
         SECTION("Positive fractional number")
         {
             Lexer positive("2.3");
-            std::vector<Token*> tokens = positive.getTokens();
+            std::vector<Token*> tokens = positive.tokenize();
             REQUIRE(tokens.size() == 1);
             REQUIRE(tokens[0]->toString() == "FRACTIONAL_NUMBER: 2.3");
 
@@ -72,7 +72,7 @@ TEST_CASE("Check for valid single tokens")
         SECTION("Negative fractional number")
         {
             Lexer negative("-3.8");
-            std::vector<Token*> tokens = negative.getTokens();
+            std::vector<Token*> tokens = negative.tokenize();
             REQUIRE(tokens.size() == 1);
             REQUIRE(tokens[0]->toString() == "FRACTIONAL_NUMBER: -3.8");
 
@@ -83,7 +83,7 @@ TEST_CASE("Check for valid single tokens")
     SECTION("Argument")
     {
         Lexer argument("#0");
-        std::vector<Token*> tokens = argument.getTokens();
+        std::vector<Token*> tokens = argument.tokenize();
         REQUIRE(tokens.size() == 1);
         REQUIRE(tokens[0]->toString() == "ARGUMENT: 0");
 
@@ -93,7 +93,7 @@ TEST_CASE("Check for valid single tokens")
     SECTION("Round brackets")
     {
         Lexer roundBrackets("()");
-        std::vector<Token*> tokens = roundBrackets.getTokens();
+        std::vector<Token*> tokens = roundBrackets.tokenize();
         REQUIRE(tokens.size() == 2);
         REQUIRE(tokens[0]->toString() == "OPENING_ROUND_BRACKET");
         REQUIRE(tokens[1]->toString() == "CLOSING_ROUND_BRACKET");
@@ -104,7 +104,7 @@ TEST_CASE("Check for valid single tokens")
     SECTION("Square brackets")
     {
         Lexer squareBrackets("[]");
-        std::vector<Token*> tokens = squareBrackets.getTokens();
+        std::vector<Token*> tokens = squareBrackets.tokenize();
         REQUIRE(tokens.size() == 2);
         REQUIRE(tokens[0]->toString() == "OPENING_SQUARE_BRACKET");
         REQUIRE(tokens[1]->toString() == "CLOSING_SQUARE_BRACKET");
@@ -115,7 +115,7 @@ TEST_CASE("Check for valid single tokens")
     SECTION("Arrow")
     {
         Lexer arrow("->");
-        std::vector<Token*> tokens = arrow.getTokens();
+        std::vector<Token*> tokens = arrow.tokenize();
         REQUIRE(tokens.size() == 1);
         REQUIRE(tokens[0]->toString() == "ARROW");
 
@@ -125,7 +125,7 @@ TEST_CASE("Check for valid single tokens")
     SECTION("Comma")
     {
         Lexer comma(",");
-        std::vector<Token*> tokens = comma.getTokens();
+        std::vector<Token*> tokens = comma.tokenize();
         REQUIRE(tokens.size() == 1);
         REQUIRE(tokens[0]->toString() == "COMMA");
 
@@ -133,12 +133,20 @@ TEST_CASE("Check for valid single tokens")
     }
 }
 
+TEST_CASE("Check empty input")
+{
+    Lexer empty("");
+    std::vector<Token*> tokens = empty.tokenize();
+
+    REQUIRE(tokens.size() == 0);
+}
+
 TEST_CASE("Check some of the examples from the description")
 {
     SECTION("Example #1")
     {
         Lexer ex1("isOdd -> eq(mod(int(#0), 2), 1)");
-        std::vector<Token*> tokens = ex1.getTokens();
+        std::vector<Token*> tokens = ex1.tokenize();
         REQUIRE(tokens.size() == 16);
         REQUIRE(tokens[0]->toString() == "FUNCTION_NAME: isOdd");
         REQUIRE(tokens[1]->toString() == "ARROW");
@@ -161,7 +169,7 @@ TEST_CASE("Check some of the examples from the description")
     SECTION("Example #2")
     {
         Lexer ex2("primes10 -> filterPrimes(concat([2], list(3, 1, 7)))");
-        std::vector<Token*> tokens = ex2.getTokens();
+        std::vector<Token*> tokens = ex2.tokenize();
         REQUIRE(tokens.size() == 20);
         REQUIRE(tokens[0]->toString() == "FUNCTION_NAME: primes10");
         REQUIRE(tokens[1]->toString() == "ARROW");
@@ -190,41 +198,41 @@ TEST_CASE("Some invalid inputs")
 {
     SECTION("Invalid characters")
     {
-        REQUIRE_THROWS(Lexer("2 + 3").getTokens());
-        REQUIRE_THROWS(Lexer("2 ? 5 : -3").getTokens());
-        REQUIRE_THROWS(Lexer("!alo").getTokens());
+        REQUIRE_THROWS(Lexer("2 + 3").tokenize());
+        REQUIRE_THROWS(Lexer("2 ? 5 : -3").tokenize());
+        REQUIRE_THROWS(Lexer("!alo").tokenize());
     }
 
     SECTION("Arguments")
     {
-        REQUIRE_THROWS(Lexer("#2.3").getTokens());
-        REQUIRE_THROWS(Lexer("#-2").getTokens());
+        REQUIRE_THROWS(Lexer("#2.3").tokenize());
+        REQUIRE_THROWS(Lexer("#-2").tokenize());
     }
 
     SECTION("Brackets")
     {
-        REQUIRE_THROWS(Lexer("(").getTokens());
-        REQUIRE_THROWS(Lexer("]").getTokens());
-        REQUIRE_THROWS(Lexer("((())").getTokens());
-        REQUIRE_THROWS(Lexer("[[]]]").getTokens());
-        REQUIRE_THROWS(Lexer("(([)]]").getTokens());
+        REQUIRE_THROWS(Lexer("(").tokenize());
+        REQUIRE_THROWS(Lexer("]").tokenize());
+        REQUIRE_THROWS(Lexer("((())").tokenize());
+        REQUIRE_THROWS(Lexer("[[]]]").tokenize());
+        REQUIRE_THROWS(Lexer("(([)]]").tokenize());
     }
 
     SECTION("Arrow")
     {
-        REQUIRE_THROWS(Lexer("<-").getTokens());
-        REQUIRE_THROWS(Lexer("<->").getTokens());
+        REQUIRE_THROWS(Lexer("<-").tokenize());
+        REQUIRE_THROWS(Lexer("<->").tokenize());
     }
 
     SECTION("Function name starting with digit")
     {
-        REQUIRE_THROWS(Lexer("1function").getTokens());
-        REQUIRE_THROWS(Lexer("23alo").getTokens());
+        REQUIRE_THROWS(Lexer("1function").tokenize());
+        REQUIRE_THROWS(Lexer("23alo").tokenize());
     }
 
     SECTION("Numbers")
     {
-        REQUIRE_THROWS(Lexer("23.00.0").getTokens());
-        REQUIRE_THROWS(Lexer("16f.05").getTokens());
+        REQUIRE_THROWS(Lexer("23.00.0").tokenize());
+        REQUIRE_THROWS(Lexer("16f.05").tokenize());
     }
 }

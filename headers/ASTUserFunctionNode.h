@@ -6,15 +6,13 @@
 struct ASTUserFunctionNode : public ASTNode
 {
 private:
-    void copyDefinitionAndArguments(const ASTUserFunctionNode& other);
-    void deallocateDefinitionAndArguments();
+    void copyDefinition(const ASTUserFunctionNode& other);
+    void deallocateDefinition();
 
 public:
     const ASTNode* definition;
-    std::vector<const ASTNode*> arguments;
 
-    ASTUserFunctionNode(const Token* token, const ASTNode* definition,
-                         const std::vector<const ASTNode*>& arguments);
+    ASTUserFunctionNode(const Token* token, const ASTNode* definition);
     ASTUserFunctionNode(const ASTUserFunctionNode& other);
     ASTUserFunctionNode& operator = (const ASTUserFunctionNode& other);
     ~ASTUserFunctionNode();

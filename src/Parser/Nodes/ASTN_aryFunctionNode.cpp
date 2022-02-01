@@ -23,7 +23,7 @@ ASTN_aryFunctionNode::ASTN_aryFunctionNode(const Token* token, const std::vector
 }
 
 ASTN_aryFunctionNode::ASTN_aryFunctionNode(const ASTN_aryFunctionNode& other)
-    : ASTNode(token)
+    : ASTNode(other)
 {
     this->copyArguments(other);
 }

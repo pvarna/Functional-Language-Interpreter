@@ -4,7 +4,8 @@ project(Functional-Language-Interpreter VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-add_library(ListFunc src/Exceptions/illegalCharacterException.cpp
+add_library(ListFunc src/Utils/stringConverter.cpp
+                     src/Exceptions/illegalCharacterException.cpp
                      src/Exceptions/missingCharacterException.cpp
                      src/Exceptions/illegalSyntaxException.cpp
                      src/Lexer/lexer.cpp
@@ -20,18 +21,22 @@ add_library(ListFunc src/Exceptions/illegalCharacterException.cpp
                      src/Parser/Nodes/ASTN_aryFunctionNode.cpp
                      src/Parser/Nodes/ASTUserFunctionNode.cpp
                      src/Parser/Nodes/ASTListNode.cpp
-                     src/Parser/parser.cpp)
+                     src/Parser/parser.cpp
+                     src/Interpreter/Literals/literal.cpp
+                     src/Interpreter/Literals/wholeNumberLiteral.cpp
+                     src/Interpreter/Literals/fractionalNumberLiteral.cpp
+                     src/Interpreter/Literals/userDefinedListLiteral.cpp
+                     src/Interpreter/Literals/functionDefinedListLiteral.cpp
+                     src/Interpreter/interpreter.cpp
+                     src/ListFunc/listFunc.cpp)
                      
 target_include_directories(ListFunc PUBLIC headers/)
 
 add_executable(ConsoleApp main.cpp)
 target_link_libraries(ConsoleApp ListFunc)
 
-add_executable(Tests test/lexerTests.cpp)
+add_executable(Tests test/lexerTests.cpp test/parserTests.cpp test/interpreterTests.cpp)
 target_link_libraries(Tests ListFunc)
-
-add_executable(Proba test.cpp)
-target_link_libraries(Proba ListFunc)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

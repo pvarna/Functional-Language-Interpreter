@@ -21,7 +21,7 @@ ASTBinaryFunctionNode::ASTBinaryFunctionNode(const Token* token, const ASTNode* 
 }
 
 ASTBinaryFunctionNode::ASTBinaryFunctionNode(const ASTBinaryFunctionNode& other)
-    : ASTNode(token)
+    : ASTNode(other)
 {
     this->copyArguments(other);
 }

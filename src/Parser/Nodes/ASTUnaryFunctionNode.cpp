@@ -17,7 +17,7 @@ ASTUnaryFunctionNode::ASTUnaryFunctionNode(const Token* token, const ASTNode* ar
 }
 
 ASTUnaryFunctionNode::ASTUnaryFunctionNode(const ASTUnaryFunctionNode& other)
-    : ASTNode(token)
+    : ASTNode(other)
 {
     this->copyArgument(other);
 }

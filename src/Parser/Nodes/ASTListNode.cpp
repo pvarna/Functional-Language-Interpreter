@@ -23,7 +23,7 @@ ASTListNode::ASTListNode(const Token* token, const std::vector<const ASTNode*>& 
 }
 
 ASTListNode::ASTListNode(const ASTListNode& other)
-    : ASTNode(token)
+    : ASTNode(other)
 {
     this->copyElements(other);
 }
