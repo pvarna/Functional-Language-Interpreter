@@ -8,23 +8,18 @@
 #include "functionNameToken.h"
 #include "argumentToken.h"
 
-const double EPS = 0.00001;
+const double Lexer::EPS = 0.00001;
 
-Lexer::Lexer(const std::string& text)
+Lexer::Lexer(const std::string& text) : text(text) {}
+
+void Lexer::deallocateTokens(std::vector<Token*>& tokens)
 {
-    this->text = text;
-}
-
-void Lexer::deallocateTokens()
-{
-    std::size_t size = this->tokens.size();
-
-    for (Token* current : this->tokens) 
+    for (Token* current : tokens) 
     {
         delete current;
     }
 
-    this->tokens.clear();
+    tokens.clear();
 }
 
 double Lexer::getNumber(std::string::iterator& it, bool isNegative, bool& isFractional)
@@ -62,10 +57,13 @@ double Lexer::getNumber(std::string::iterator& it, bool isNegative, bool& isFrac
 
     if (isFractional)
     {
-        result /= std::pow(10.0, posAfterDecimalDot);
+        for (int i = 0; i < posAfterDecimalDot; ++i) 
+        {
+            result /= 10;
+        }
     }
 
-    if (isFractional && decimalPart - 0 < EPS)
+    if (isFractional && std::abs(decimalPart - 0) < EPS)
     {
         isFractional = false;
     }
@@ -78,37 +76,29 @@ double Lexer::getNumber(std::string::iterator& it, bool isNegative, bool& isFrac
     return result;
 }
 
-void Lexer::number(std::string::iterator& it, bool isNegative)
+Token* Lexer::number(std::string::iterator& it, bool isNegative)
 {
     double value;
     bool isFractional;
-    try
-    {
-        value = this->getNumber(it, isNegative, isFractional);
-        if (isFractional)
-        {
-            this->tokens.push_back(new FractionalNumberToken(value));
-        }
-        else
-        {
-            this->tokens.push_back(new WholeNumberToken(value));
-        }
-    }
-    catch(const std::exception& e)
-    {
-        this->deallocateTokens();
-        throw;
-    }
+
+    Token* result = nullptr;
+
+    value = this->getNumber(it, isNegative, isFractional);
 
     if (it != this->text.end() && !isspace(*it) && (*it != ',') && (*it != ')') && (*it != ']')) 
     {
-        this->deallocateTokens();
         throw IllegalCharacterException(*it, this->text, it - this->text.begin());
     }
     --it;
+
+    if (isFractional)
+    {
+        return new FractionalNumberToken(value);
+    }
+    return new WholeNumberToken(value);
 }
 
-void Lexer::functionName(std::string::iterator& it)
+Token* Lexer::functionName(std::string::iterator& it)
 {
     std::string functionName;
 
@@ -118,203 +108,159 @@ void Lexer::functionName(std::string::iterator& it)
         ++it;
     }
 
-    try
-    {
-        this->tokens.push_back(new FunctionNameToken(functionName));
-    }
-    catch(const std::bad_alloc& ba)
-    {
-        this->deallocateTokens();
-        throw;
-    }
-
     if (it != this->text.end() &&!isspace(*it) && (*it != '(')) 
     {
-        this->deallocateTokens();
         throw IllegalCharacterException(*it, this->text, it - this->text.begin());
     }
     --it;
+
+    return new FunctionNameToken(functionName);
 }
 
-void Lexer::dash(std::string::iterator& it)
+Token* Lexer::dash(std::string::iterator& it)
 {
     ++it;
     if (it == this->text.end())
     {
-        this->deallocateTokens();
         throw MissingCharacterException('>', this->text, it - this->text.begin());
     }
-    if (*it != '>' && !isdigit(*it))
-    {
-        this->deallocateTokens();
-        throw IllegalCharacterException(*it, this->text, it - this->text.begin());
-    }
+
     if (*it == '>')
     {
-        try
-        {
-            this->tokens.push_back(new Token(TokenType::ARROW));
-        }
-        catch(const std::bad_alloc& ba)
-        {
-            this->deallocateTokens();
-            throw;
-        }
+        return new Token(TokenType::ARROW);
     }
     else if (isdigit(*it))
     {
-        this->number(it, true);
+        return this->number(it, true);
     }
+
+    throw IllegalCharacterException(*it, this->text, it - this->text.begin());
 }
 
-void Lexer::openingBracket(char bracket)
+Token* Lexer::openingBracket(char bracket, std::stack<char>& brackets)
 {
-    this->brackets.push(bracket);
+    brackets.push(bracket);
 
     TokenType type = (bracket == '(') ? TokenType::OPENING_ROUND_BRACKET :
-                                   TokenType::OPENING_SQUARE_BRACKET;
+                                        TokenType::OPENING_SQUARE_BRACKET;
 
-    try
-    {
-        this->tokens.push_back(new Token(type));
-    }
-    catch(const std::bad_alloc& ba)
-    {
-        this->deallocateTokens();
-        throw;
-    }
+    return new Token(type);
 }
 
-void Lexer::closingBracket(std::string::iterator& it, char bracket)
+Token* Lexer::closingBracket(std::string::iterator& it, char bracket, std::stack<char>& brackets)
 {
     char bracketToBeOnTop = (bracket == ')') ? '(' : '[';
 
-    if (this->brackets.empty() || this->brackets.top() != bracketToBeOnTop)
+    if (brackets.empty() || brackets.top() != bracketToBeOnTop)
     {
-        this->deallocateTokens();
         throw IllegalCharacterException(*it, this->text, it - this->text.begin());
     }
 
-    this->brackets.pop();
+    brackets.pop();
 
     TokenType type = (bracket == ')') ? TokenType::CLOSING_ROUND_BRACKET :
-                                   TokenType::CLOSING_SQUARE_BRACKET;
+                                        TokenType::CLOSING_SQUARE_BRACKET;
 
-    try
-    {
-        this->tokens.push_back(new Token(type));
-    }
-    catch(const std::bad_alloc& ba)
-    {
-        this->deallocateTokens();
-        throw;
-    }
+    return new Token(type);
 }
 
-void Lexer::comma()
+Token* Lexer::comma()
 {
-    try
-    {
-        this->tokens.push_back(new Token(TokenType::COMMA));
-    }
-    catch(const std::bad_alloc& ba)
-    {
-        this->deallocateTokens();
-        throw;
-    }
+    return new Token(TokenType::COMMA);
 }
 
-void Lexer::argument(std::string::iterator& it)
+Token* Lexer::argument(std::string::iterator& it)
 {
     ++it;
     if (!isdigit(*it))
     {
-        this->deallocateTokens();
         throw IllegalCharacterException(*it, this->text, it - this->text.begin());
     }
 
     double value = 0;
-    try
-    {
-        while (it != this->text.end() && (isdigit(*it) || *it == '.'))
-        {    
-            if (*it == '.')
-            {
-                throw IllegalCharacterException(*it, this->text, it - this->text.begin());
-            }
-            else 
-            {   
-                value *= 10;
-                value += (*it - '0');
-            }
-            ++it;
+    
+    while (it != this->text.end() && (isdigit(*it) || *it == '.'))
+    {    
+        if (*it == '.')
+        {
+            throw IllegalCharacterException(*it, this->text, it - this->text.begin());
         }
-    }
-    catch(const std::exception& e)
-    {
-        this->deallocateTokens();
-        throw;
+        else 
+        {   
+            value *= 10;
+            value += (*it - '0');
+        }
+        ++it;
     }
 
-    try
-    {
-        this->tokens.push_back(new ArgumentToken(value));
-    }
-    catch(const std::exception& e)
-    {
-        this->deallocateTokens();
-        throw;
-    }
     --it;
+    return new ArgumentToken(value);
 }
 
 std::vector<Token*> Lexer::tokenize()
 {
+    std::vector<Token*> tokens;
+    std::stack<char> brackets;
+
     for (std::string::iterator it = this->text.begin(); it != this->text.end(); ++it)
     {
-        if (isspace(*it)) 
+        Token* tokenToAdd = nullptr;
+
+        try 
         {
-            continue;
+            if (isspace(*it)) 
+            {
+                continue;
+            }
+            else if (*it == '-')
+            {
+                tokenToAdd = this->dash(it);
+            }
+            else if (isdigit(*it))
+            {
+                tokenToAdd = this->number(it, false);
+            }
+            else if (isalpha(*it))
+            {
+                tokenToAdd = this->functionName(it);
+            }
+            else if (*it == '(' || *it == '[')
+            {
+                tokenToAdd = this->openingBracket(*it, brackets);
+            }
+            else if (*it == ')' || *it == ']')
+            {
+                tokenToAdd = this->closingBracket(it, *it, brackets);
+            }
+            else if (*it == ',')
+            {
+                tokenToAdd = this->comma();
+            }
+            else if (*it == '#')
+            {
+                tokenToAdd = this->argument(it);
+            }
+            else
+            {
+                throw IllegalCharacterException(*it, this->text, it - this->text.begin());
+            }
         }
-        else if (*it == '-')
+        catch(...) 
         {
-            this->dash(it);
+            this->deallocateTokens(tokens);
+            throw;
         }
-        else if (isdigit(*it))
+
+        if (tokenToAdd) 
         {
-            this->number(it, false);
-        }
-        else if (isalpha(*it))
-        {
-            this->functionName(it);
-        }
-        else if (*it == '(' || *it == '[')
-        {
-            this->openingBracket(*it);
-        }
-        else if (*it == ')' || *it == ']')
-        {
-            this->closingBracket(it, *it);
-        }
-        else if (*it == ',')
-        {
-            this->comma();
-        }
-        else if (*it == '#')
-        {
-            this->argument(it);
-        }
-        else
-        {
-            this->deallocateTokens();
-            throw IllegalCharacterException(*it, this->text, it - this->text.begin());
+            tokens.push_back(tokenToAdd);
         }
     }
 
-    if (!this->brackets.empty())
+    if (!brackets.empty())
     {
-        this->deallocateTokens();
-        char expected = this->brackets.top() == '(' ? ')' : ']';
+        this->deallocateTokens(tokens);
+        char expected = brackets.top() == '(' ? ')' : ']';
         throw MissingCharacterException(expected, this->text, this->text.end() - this->text.begin());
     }
 

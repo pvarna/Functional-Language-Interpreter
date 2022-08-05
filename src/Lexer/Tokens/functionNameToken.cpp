@@ -1,9 +1,7 @@
 #include "functionNameToken.h"
 
-FunctionNameToken::FunctionNameToken(const std::string& name) : Token(TokenType::FUNCTION_NAME)
-{
-    this->name = name;
-}
+FunctionNameToken::FunctionNameToken(const std::string& name) 
+    : Token(TokenType::FUNCTION_NAME), name(name) {}
 
 std::string FunctionNameToken::toString() const
 {

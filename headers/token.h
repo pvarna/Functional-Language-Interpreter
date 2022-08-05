@@ -10,4 +10,6 @@ struct Token
     Token(const TokenType& type);
 
     virtual std::string toString() const;
+    
+    virtual ~Token() = default;
 };

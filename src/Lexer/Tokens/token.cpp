@@ -1,9 +1,6 @@
 #include "token.h"
 
-Token::Token(const TokenType& type) 
-{
-    this->type = type;
-}
+Token::Token(const TokenType& type) : type(type) {}
 
 std::string Token::toString() const
 {

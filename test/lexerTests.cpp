@@ -138,7 +138,7 @@ TEST_CASE("Check empty input")
     Lexer empty("");
     std::vector<Token*> tokens = empty.tokenize();
 
-    REQUIRE(tokens.size() == 0);
+    REQUIRE(tokens.empty());
 }
 
 TEST_CASE("Check some of the examples from the description")
@@ -164,6 +164,8 @@ TEST_CASE("Check some of the examples from the description")
         REQUIRE(tokens[13]->toString() == "COMMA");
         REQUIRE(tokens[14]->toString() == "WHOLE_NUMBER: 1");
         REQUIRE(tokens[15]->toString() == "CLOSING_ROUND_BRACKET");
+
+        deallocateTokens(tokens);
     }
 
     SECTION("Example #2")
@@ -191,6 +193,8 @@ TEST_CASE("Check some of the examples from the description")
         REQUIRE(tokens[17]->toString() == "CLOSING_ROUND_BRACKET");
         REQUIRE(tokens[18]->toString() == "CLOSING_ROUND_BRACKET");
         REQUIRE(tokens[19]->toString() == "CLOSING_ROUND_BRACKET");
+
+        deallocateTokens(tokens);
     }
 }
 

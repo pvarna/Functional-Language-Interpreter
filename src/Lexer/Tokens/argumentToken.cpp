@@ -1,10 +1,8 @@
 #include "argumentToken.h"
 #include "stringConverter.h"
 
-ArgumentToken::ArgumentToken(const unsigned int index) : Token(TokenType::ARGUMENT)
-{
-    this->index = index;
-}
+ArgumentToken::ArgumentToken(const unsigned int index) 
+    : Token(TokenType::ARGUMENT), index(index) {}
 
 std::string ArgumentToken::toString() const
 {
