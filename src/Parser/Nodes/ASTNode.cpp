@@ -4,63 +4,41 @@
 #include "fractionalNumberToken.h"
 #include "wholeNumberToken.h"
 
-void ASTNode::copyToken(const Token* token)
+void ASTNode::copy(const ASTNode& other)
 {
-    if (!token)
+    if (!other.token)
     {
-        this->token = nullptr;
+        return;
     }
-    else if (token->type == TokenType::ARGUMENT)
-    {
-        const ArgumentToken* argumentToken = dynamic_cast<const ArgumentToken*>(token);
 
-        this->token = new ArgumentToken(argumentToken->index);
-    }
-    else if (token->type == TokenType::FUNCTION_NAME)
-    {
-        const FunctionNameToken* functionNameToken = dynamic_cast<const FunctionNameToken*>(token);
-
-        this->token = new FunctionNameToken(functionNameToken->name);
-    }
-    else if (token->type == TokenType::FRACTIONAL_NUMBER)
-    {
-        const FractionalNumberToken* fractionalNumberToken = dynamic_cast<const FractionalNumberToken*>(token);
-
-        this->token = new FractionalNumberToken(fractionalNumberToken->value);
-    }
-    else if (token->type == TokenType::WHOLE_NUMBER)
-    {
-        const WholeNumberToken* wholeNumberToken = dynamic_cast<const WholeNumberToken*>(token);
-
-        this->token = new WholeNumberToken(wholeNumberToken->value);
-    }
-    else
-    {
-        this->token = new Token(token->type);
-    }
+    this->token = other.token->clone();
 }
 
-void ASTNode::deallocateToken()
+void ASTNode::deallocate()
 {
     delete this->token;
 }
 
-ASTNode::ASTNode(const Token* token)
+ASTNode::ASTNode(const Token* token) : token(nullptr)
 {
-    this->token = token;
+    if (!token)
+    {
+        throw std::invalid_argument("The token shouldn't be nullptr");
+    }
+    this->token = token->clone();
 }
 
-ASTNode::ASTNode(const ASTNode& other)
+ASTNode::ASTNode(const ASTNode& other) : token(nullptr)
 {
-    this->copyToken(other.token);
+    this->copy(other);
 }
 
 ASTNode& ASTNode::operator = (const ASTNode& other)
 {
     if (this != &other)
     {
-        this->deallocateToken();
-        this->copyToken(other.token);
+        this->deallocate();
+        this->copy(other);
     }
 
     return *this;
@@ -68,7 +46,7 @@ ASTNode& ASTNode::operator = (const ASTNode& other)
 
 ASTNode::~ASTNode()
 {
-    this->deallocateToken();
+    this->deallocate();
 }
 
 std::string ASTNode::toString() const

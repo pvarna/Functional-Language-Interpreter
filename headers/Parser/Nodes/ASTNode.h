@@ -5,11 +5,11 @@
 struct ASTNode
 {
 private:
-    void copyToken(const Token* token);
-    void deallocateToken();
+    void copy(const ASTNode& other);
+    void deallocate();
 
 public:
-    const Token* token;
+    Token* token;
 
     ASTNode(const Token* token);
     ASTNode(const ASTNode& other);
