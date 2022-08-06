@@ -14,7 +14,8 @@ public:
     ASTNode(const Token* token);
     ASTNode(const ASTNode& other);
     ASTNode& operator = (const ASTNode& other);
-    ~ASTNode();
+    virtual ~ASTNode();
 
     virtual std::string toString() const;
+    virtual ASTNode* clone() const;
 };

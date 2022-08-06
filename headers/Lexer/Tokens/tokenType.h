@@ -11,5 +11,5 @@ enum class TokenType
     COMMA,
     ARGUMENT,
     WHOLE_NUMBER,
-    FRACTIONAL_NUMBER
+    FRACTIONAL_NUMBER,
 };

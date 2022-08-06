@@ -5,8 +5,8 @@
 struct ASTBinaryFunctionNode : public ASTNode
 {
 private:
-    void copyArguments(const ASTBinaryFunctionNode& other);
-    void deallocateArguments();
+    void copy(const ASTBinaryFunctionNode& other);
+    void deallocate();
 
 public:
     const ASTNode* firstArgument;
@@ -19,4 +19,5 @@ public:
     ~ASTBinaryFunctionNode();
 
     virtual std::string toString() const override;
+    virtual ASTBinaryFunctionNode* clone() const override;
 };

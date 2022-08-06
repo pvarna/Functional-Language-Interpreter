@@ -6,11 +6,6 @@
 
 void ASTNode::copy(const ASTNode& other)
 {
-    if (!other.token)
-    {
-        return;
-    }
-
     this->token = other.token->clone();
 }
 
@@ -19,14 +14,7 @@ void ASTNode::deallocate()
     delete this->token;
 }
 
-ASTNode::ASTNode(const Token* token) : token(nullptr)
-{
-    if (!token)
-    {
-        throw std::invalid_argument("The token shouldn't be nullptr");
-    }
-    this->token = token->clone();
-}
+ASTNode::ASTNode(const Token* token) : token(token->clone()) {}
 
 ASTNode::ASTNode(const ASTNode& other) : token(nullptr)
 {
@@ -55,4 +43,9 @@ std::string ASTNode::toString() const
     result += this->token->toString() + ")";
     
     return result;
+}
+
+ASTNode* ASTNode::clone() const
+{
+    return new ASTNode(*this);
 }

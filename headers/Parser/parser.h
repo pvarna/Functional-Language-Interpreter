@@ -18,7 +18,7 @@ class Parser
 private:
     std::string text; //!< stores the input
     std::vector<Token*> tokens; //!< stores the tokens generated from the lexer
-    int currentIndex;
+    std::vector<Token*>::iterator it; //!< current position
 
     //! Helper function for generating a number node - whole or fractional
     ASTNode* number();
@@ -28,6 +28,8 @@ private:
 
     //! Helper function for generating a function node - unary, binary, ternary, etc.
     ASTNode* function();
+
+    void deallocateNodes(std::vector<const ASTNode*>& nodes);
 
 public:
 
@@ -40,8 +42,8 @@ public:
     //! Deleted copy assignment operator
     Parser operator = (const Parser& other) = delete;
 
-    //! Destructor which deallocates the memory allocated for the tokens
-    ~Parser();
+    //! Default destructor
+    ~Parser() = default;
 
     //! Main function which generates the AST
     ASTNode* parse();

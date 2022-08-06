@@ -1,13 +1,13 @@
 #include "ASTTernaryFunctionNode.h"
 
-void ASTTernaryFunctionNode::copyArguments(const ASTTernaryFunctionNode& other)
+void ASTTernaryFunctionNode::copy(const ASTTernaryFunctionNode& other)
 {
-    this->firstArgument = new ASTNode(*other.firstArgument);
-    this->secondArgument = new ASTNode(*other.secondArgument);
-    this->thirdArgument = new ASTNode(*other.thirdArgument);
+    this->firstArgument = other.firstArgument->clone();
+    this->secondArgument = other.secondArgument->clone();
+    this->thirdArgument = other.thirdArgument->clone();
 }
 
-void ASTTernaryFunctionNode::deallocateArguments()
+void ASTTernaryFunctionNode::deallocate()
 {
     delete this->firstArgument;
     delete this->secondArgument;
@@ -16,26 +16,23 @@ void ASTTernaryFunctionNode::deallocateArguments()
 
 ASTTernaryFunctionNode::ASTTernaryFunctionNode(const Token* token, const ASTNode* firstArgument,
                         const ASTNode* secondArgument, const ASTNode* thirdArgument)
-    : ASTNode(token)
-{
-    this->firstArgument = firstArgument;
-    this->secondArgument = secondArgument;
-    this->thirdArgument = thirdArgument;
-}
+    : ASTNode(token), firstArgument(firstArgument),
+                      secondArgument(secondArgument),
+                      thirdArgument(thirdArgument) {}
 
 ASTTernaryFunctionNode::ASTTernaryFunctionNode(const ASTTernaryFunctionNode& other)
     : ASTNode(other)
 {
-    this->copyArguments(other);
+    this->copy(other);
 }
 
 ASTTernaryFunctionNode& ASTTernaryFunctionNode::operator = (const ASTTernaryFunctionNode& other)
 {
     if (this != &other)
     {
-        this->deallocateArguments();
+        this->deallocate();
         ASTNode::operator=(other);
-        this->copyArguments(other);
+        this->copy(other);
     }
 
     return *this;
@@ -43,7 +40,7 @@ ASTTernaryFunctionNode& ASTTernaryFunctionNode::operator = (const ASTTernaryFunc
 
 ASTTernaryFunctionNode::~ASTTernaryFunctionNode()
 {
-    this->deallocateArguments();
+    this->deallocate();
 }
 
 std::string ASTTernaryFunctionNode::toString() const
@@ -54,4 +51,9 @@ std::string ASTTernaryFunctionNode::toString() const
                                               this->thirdArgument->toString() + ")";
 
     return result;
+}
+
+ASTTernaryFunctionNode* ASTTernaryFunctionNode::clone() const
+{
+    return new ASTTernaryFunctionNode(*this);
 }

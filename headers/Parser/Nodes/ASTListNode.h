@@ -6,8 +6,8 @@
 struct ASTListNode : public ASTNode
 {
 private:
-    void copyElements(const ASTListNode& other);
-    void deallocateElements();
+    void copy(const ASTListNode& other);
+    void deallocate();
 
 public:
     std::vector<const ASTNode*> elements;
@@ -18,4 +18,5 @@ public:
     ~ASTListNode();
 
     virtual std::string toString() const override;
+    virtual ASTListNode* clone() const override;
 };

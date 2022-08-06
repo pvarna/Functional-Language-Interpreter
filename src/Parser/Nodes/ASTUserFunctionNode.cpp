@@ -1,34 +1,31 @@
 #include "ASTUserFunctionNode.h"
 
-void ASTUserFunctionNode::copyDefinition(const ASTUserFunctionNode& other)
+void ASTUserFunctionNode::copy(const ASTUserFunctionNode& other)
 {
-    this->definition = new ASTNode(*other.definition);
+    this->definition = other.definition->clone();
 }
 
-void ASTUserFunctionNode::deallocateDefinition()
+void ASTUserFunctionNode::deallocate()
 {
     delete this->definition;
 }
 
 ASTUserFunctionNode::ASTUserFunctionNode(const Token* token, const ASTNode* definition)
-    : ASTNode(token)
-{
-    this->definition = definition;
-}
+    : ASTNode(token), definition(definition) {}
 
 ASTUserFunctionNode::ASTUserFunctionNode(const ASTUserFunctionNode& other)
     : ASTNode(other)
 {
-    this->copyDefinition(other);
+    this->copy(other);
 }
 
 ASTUserFunctionNode& ASTUserFunctionNode::operator = (const ASTUserFunctionNode& other)
 {
     if (this != &other)
     {
-        this->deallocateDefinition();
+        this->deallocate();
         ASTNode::operator=(other);
-        this->copyDefinition(other);
+        this->copy(other);
     }
 
     return *this;
@@ -36,7 +33,7 @@ ASTUserFunctionNode& ASTUserFunctionNode::operator = (const ASTUserFunctionNode&
 
 ASTUserFunctionNode::~ASTUserFunctionNode()
 {
-    this->deallocateDefinition();
+    this->deallocate();
 }
 
 std::string ASTUserFunctionNode::toString() const
@@ -45,4 +42,9 @@ std::string ASTUserFunctionNode::toString() const
     result += this->token->toString() + " " + this->definition->toString() + ")";
 
     return result;
+}
+
+ASTUserFunctionNode* ASTUserFunctionNode::clone() const
+{
+    return new ASTUserFunctionNode(*this);
 }

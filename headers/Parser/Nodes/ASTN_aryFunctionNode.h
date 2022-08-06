@@ -6,8 +6,8 @@
 struct ASTN_aryFunctionNode : public ASTNode
 {
 private:
-    void copyArguments(const ASTN_aryFunctionNode& other);
-    void deallocateArguments();
+    void copy(const ASTN_aryFunctionNode& other);
+    void deallocate();
 
 public:
     std::vector<const ASTNode*> arguments;
@@ -18,4 +18,5 @@ public:
     ~ASTN_aryFunctionNode();
 
     virtual std::string toString() const override;
+    virtual ASTN_aryFunctionNode* clone() const override;
 };

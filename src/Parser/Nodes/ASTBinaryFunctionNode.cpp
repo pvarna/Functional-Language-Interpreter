@@ -1,12 +1,12 @@
 #include "ASTBinaryFunctionNode.h"
 
-void ASTBinaryFunctionNode::copyArguments(const ASTBinaryFunctionNode& other)
+void ASTBinaryFunctionNode::copy(const ASTBinaryFunctionNode& other)
 {
-    this->firstArgument = new ASTNode(*other.firstArgument);
-    this->secondArgument = new ASTNode(*other.secondArgument);
+    this->firstArgument = other.firstArgument->clone();
+    this->secondArgument = other.secondArgument->clone();
 }
 
-void ASTBinaryFunctionNode::deallocateArguments()
+void ASTBinaryFunctionNode::deallocate()
 {
     delete this->firstArgument;
     delete this->secondArgument;
@@ -14,25 +14,22 @@ void ASTBinaryFunctionNode::deallocateArguments()
 
 ASTBinaryFunctionNode::ASTBinaryFunctionNode(const Token* token, const ASTNode* firstArgument,
                                                                  const ASTNode* secondArgument)
-    : ASTNode(token)
-{
-    this->firstArgument = firstArgument;
-    this->secondArgument = secondArgument;
-}
+    : ASTNode(token), firstArgument(firstArgument),
+                      secondArgument(secondArgument) {}
 
 ASTBinaryFunctionNode::ASTBinaryFunctionNode(const ASTBinaryFunctionNode& other)
     : ASTNode(other)
 {
-    this->copyArguments(other);
+    this->copy(other);
 }
 
 ASTBinaryFunctionNode& ASTBinaryFunctionNode::operator = (const ASTBinaryFunctionNode& other)
 {
     if (this != &other)
     {
-        this->deallocateArguments();
+        this->deallocate();
         ASTNode::operator=(other);
-        this->copyArguments(other);
+        this->copy(other);
     }
 
     return *this;
@@ -40,7 +37,7 @@ ASTBinaryFunctionNode& ASTBinaryFunctionNode::operator = (const ASTBinaryFunctio
 
 ASTBinaryFunctionNode::~ASTBinaryFunctionNode()
 {
-    this->deallocateArguments();
+    this->deallocate();
 }
 
 std::string ASTBinaryFunctionNode::toString() const
@@ -50,4 +47,9 @@ std::string ASTBinaryFunctionNode::toString() const
                                               this->secondArgument->toString() + ")";
 
     return result;
+}
+
+ASTBinaryFunctionNode* ASTBinaryFunctionNode::clone() const
+{
+    return new ASTBinaryFunctionNode(*this);   
 }

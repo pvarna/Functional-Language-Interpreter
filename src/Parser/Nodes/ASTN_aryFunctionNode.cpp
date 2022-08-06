@@ -1,40 +1,44 @@
 #include "ASTN_aryFunctionNode.h"
 
-void ASTN_aryFunctionNode::copyArguments(const ASTN_aryFunctionNode& other)
+void ASTN_aryFunctionNode::copy(const ASTN_aryFunctionNode& other)
 {
     for (const ASTNode* current : other.arguments)
     {
-        this->arguments.push_back(new ASTNode(*current));
+        this->arguments.push_back(current->clone());
     }
 }
 
-void ASTN_aryFunctionNode::deallocateArguments()
+void ASTN_aryFunctionNode::deallocate()
 {
     for (const ASTNode* current : this->arguments)
     {
         delete current;
     }
+    this->arguments.clear();
 }
 
 ASTN_aryFunctionNode::ASTN_aryFunctionNode(const Token* token, const std::vector<const ASTNode*>& arguments)
     : ASTNode(token)
 {
-    this->arguments = arguments;
+    for (const ASTNode* current : arguments)
+    {
+        this->arguments.push_back(current);
+    }
 }
 
 ASTN_aryFunctionNode::ASTN_aryFunctionNode(const ASTN_aryFunctionNode& other)
     : ASTNode(other)
 {
-    this->copyArguments(other);
+    this->copy(other);
 }
 
 ASTN_aryFunctionNode& ASTN_aryFunctionNode::operator = (const ASTN_aryFunctionNode& other)
 {
     if (this != &other)
     {
-        this->deallocateArguments();
+        this->deallocate();
         ASTNode::operator=(other);
-        this->copyArguments(other);
+        this->copy(other);
     }
 
     return *this;
@@ -42,7 +46,7 @@ ASTN_aryFunctionNode& ASTN_aryFunctionNode::operator = (const ASTN_aryFunctionNo
 
 ASTN_aryFunctionNode::~ASTN_aryFunctionNode()
 {
-    this->deallocateArguments();
+    this->deallocate();
 }
 
 std::string ASTN_aryFunctionNode::toString() const
@@ -58,4 +62,9 @@ std::string ASTN_aryFunctionNode::toString() const
     result += ")";
 
     return result;
+}
+
+ASTN_aryFunctionNode* ASTN_aryFunctionNode::clone() const
+{
+    return new ASTN_aryFunctionNode(*this);
 }

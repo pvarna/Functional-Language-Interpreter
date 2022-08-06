@@ -1,14 +1,14 @@
 #include "ASTListNode.h"
 
-void ASTListNode::copyElements(const ASTListNode& other)
+void ASTListNode::copy(const ASTListNode& other)
 {
     for (const ASTNode* current : other.elements)
     {
-        this->elements.push_back(new ASTNode(*current));
+        this->elements.push_back(current->clone());
     }
 }
 
-void ASTListNode::deallocateElements()
+void ASTListNode::deallocate()
 {
     for (const ASTNode* current : this->elements)
     {
@@ -19,22 +19,25 @@ void ASTListNode::deallocateElements()
 ASTListNode::ASTListNode(const Token* token, const std::vector<const ASTNode*>& elements)
     : ASTNode(token)
 {
-    this->elements = elements;
+    for (const ASTNode* current : elements)
+    {
+        this->elements.push_back(current);
+    }
 }
 
 ASTListNode::ASTListNode(const ASTListNode& other)
     : ASTNode(other)
 {
-    this->copyElements(other);
+    this->copy(other);
 }
 
 ASTListNode& ASTListNode::operator = (const ASTListNode& other)
 {
     if (this != &other)
     {
-        this->deallocateElements();
+        this->deallocate();
         ASTNode::operator=(other);
-        this->copyElements(other);
+        this->copy(other);
     }
 
     return *this;
@@ -42,7 +45,7 @@ ASTListNode& ASTListNode::operator = (const ASTListNode& other)
 
 ASTListNode::~ASTListNode()
 {
-    this->deallocateElements();
+    this->deallocate();
 }
 
 std::string ASTListNode::toString() const
@@ -56,4 +59,9 @@ std::string ASTListNode::toString() const
     result += " ]";
 
     return result;
+}
+
+ASTListNode* ASTListNode::clone() const
+{
+    return new ASTListNode(*this);
 }

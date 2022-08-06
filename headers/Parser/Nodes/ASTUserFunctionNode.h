@@ -6,8 +6,8 @@
 struct ASTUserFunctionNode : public ASTNode
 {
 private:
-    void copyDefinition(const ASTUserFunctionNode& other);
-    void deallocateDefinition();
+    void copy(const ASTUserFunctionNode& other);
+    void deallocate();
 
 public:
     const ASTNode* definition;
@@ -18,4 +18,5 @@ public:
     ~ASTUserFunctionNode();
 
     virtual std::string toString() const override;
+    virtual ASTUserFunctionNode* clone() const override;
 };

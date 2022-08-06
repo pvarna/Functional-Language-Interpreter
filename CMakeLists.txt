@@ -44,6 +44,7 @@ add_executable(ConsoleApp main.cpp)
 target_link_libraries(ConsoleApp ListFunc)
 
 add_executable(Tests test/lexerTests.cpp test/parserTests.cpp test/interpreterTests.cpp)
+# add_executable(Tests test/parserTests.cpp)
 target_link_libraries(Tests ListFunc)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

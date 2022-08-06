@@ -12,182 +12,241 @@ Parser::Parser(const std::string& text, const std::vector<Token*>& tokens)
 {
     this->text = text;
     this->tokens = tokens;
-    this->currentIndex = 0;
+    this->it = this->tokens.begin();
 }
 
 ASTNode* Parser::number()
 {
-    if (this->tokens[this->currentIndex]->type != TokenType::WHOLE_NUMBER && 
-        this->tokens[this->currentIndex]->type != TokenType::FRACTIONAL_NUMBER)
+    if ((*it)->type != TokenType::WHOLE_NUMBER && 
+        (*it)->type != TokenType::FRACTIONAL_NUMBER)
     {
         throw IllegalSyntaxException("Expected a number", this->text);
     }
 
-    return new ASTNode(this->tokens[this->currentIndex]);
+    return new ASTNode(*it);
+}
+
+void Parser::deallocateNodes(std::vector<const ASTNode*>& nodes)
+{
+    for (const ASTNode* current : nodes)
+    {
+        delete current;
+    }
+
+    nodes.clear();
 }
 
 ASTNode* Parser::list()
 {
-    if (this->tokens[this->currentIndex]->type != TokenType::OPENING_SQUARE_BRACKET)
+    if ((*it)->type != TokenType::OPENING_SQUARE_BRACKET)
     {
         throw IllegalSyntaxException("Expected a [", this->text);
     }
 
-    ++this->currentIndex;
-    if (this->currentIndex >= this->tokens.size())
+    const Token* openingSquareBracket = *it;
+
+    ++it;
+    if (it == this->tokens.end())
     {
         throw IllegalSyntaxException("Expected a ]", this->text);
     }
 
     std::vector<const ASTNode*> elements;
-    while (this->tokens[this->currentIndex]->type != TokenType::CLOSING_SQUARE_BRACKET)
+    while ((*it)->type != TokenType::CLOSING_SQUARE_BRACKET)
     {
-        switch (this->tokens[this->currentIndex]->type)
+        const ASTNode* toAdd = nullptr;
+        try
         {
-        case TokenType::WHOLE_NUMBER:
-        case TokenType::FRACTIONAL_NUMBER:
-            elements.push_back(this->number());
-            break;
-        
-        case TokenType::OPENING_SQUARE_BRACKET:
-            elements.push_back(this->list());
-            break;
+            switch ((*it)->type)
+            {
+            case TokenType::WHOLE_NUMBER:
+            case TokenType::FRACTIONAL_NUMBER:
+                toAdd = this->number();
+                break;
+            
+            case TokenType::OPENING_SQUARE_BRACKET:
+                toAdd = this->list();
+                break;
 
-        default:
-            throw IllegalSyntaxException("Expected a number or another list", this->text);
+            default:
+                throw IllegalSyntaxException("Expected a number or another list", this->text);
+            }
+        }
+        catch(...)
+        {
+            deallocateNodes(elements);
+            throw;
         }
 
-        ++this->currentIndex;
-
-        if (this->currentIndex >= this->tokens.size())
+        if (toAdd)
         {
+            elements.push_back(toAdd);
+        }
+
+        ++it;
+        if (it == this->tokens.end())
+        {
+            deallocateNodes(elements);
             throw IllegalSyntaxException("Expected a ]", this->text);
         }
     }
 
-    return new ASTListNode(nullptr, elements);
+    try
+    {
+        return new ASTListNode(openingSquareBracket, elements);
+    }
+    catch(...)
+    {
+        deallocateNodes(elements);
+        throw;
+    }
 }
 
 ASTNode* Parser::function()
 {
-    if (this->tokens[this->currentIndex]->type != TokenType::FUNCTION_NAME)
+    if ((*it)->type != TokenType::FUNCTION_NAME)
     {
         throw IllegalSyntaxException("Expected a function name", this->text);
     }
 
-    Token* functionName = this->tokens[this->currentIndex];
+    Token* functionName = *it;
 
-    ++this->currentIndex;
-    if (this->currentIndex >= this->tokens.size() || 
-        this->tokens[this->currentIndex]->type != TokenType::OPENING_ROUND_BRACKET)
+    ++it;
+    if (it == this->tokens.end() || (*it)->type != TokenType::OPENING_ROUND_BRACKET)
     {
         throw IllegalSyntaxException("Expected a (", this->text);
     }
     
-    ++this->currentIndex;
-    if (this->currentIndex >= this->tokens.size())
+    ++it;
+    if (it == this->tokens.end())
     {
         throw IllegalSyntaxException("Expected a )", this->text);
     }
 
     std::vector<const ASTNode*> arguments;
 
-    while (this->tokens[this->currentIndex]->type != TokenType::CLOSING_ROUND_BRACKET)
+    while ((*it)->type != TokenType::CLOSING_ROUND_BRACKET)
     {
-        switch (this->tokens[this->currentIndex]->type)
+        const ASTNode* toAdd = nullptr;
+
+        try
         {
-        case TokenType::WHOLE_NUMBER:
-        case TokenType::FRACTIONAL_NUMBER:
-            arguments.push_back(this->number());
-            break;
+            switch ((*it)->type)
+            {
+            case TokenType::WHOLE_NUMBER:
+            case TokenType::FRACTIONAL_NUMBER:
+                toAdd = this->number();
+                break;
 
-        case TokenType::OPENING_SQUARE_BRACKET:
-            arguments.push_back(this->list());
-            break;
+            case TokenType::OPENING_SQUARE_BRACKET:
+                toAdd = this->list();
+                break;
 
-        case TokenType::FUNCTION_NAME:
-            arguments.push_back(this->function());
-            break;
+            case TokenType::FUNCTION_NAME:
+                toAdd = this->function();
+                break;
 
-        case TokenType::ARGUMENT:
-            arguments.push_back(new ASTNode(this->tokens[this->currentIndex]));
-            break;
+            case TokenType::ARGUMENT:
+                toAdd = new ASTNode(*it);
+                break;
 
-        default:
-            throw IllegalSyntaxException("Expected a number, list, function argument or another function", this->text);
+            default:
+                throw IllegalSyntaxException("Expected a number, list, function argument or another function", this->text);
+            }
+        }
+        catch(...)
+        {
+            deallocateNodes(arguments);
+            throw;
         }
 
-        ++this->currentIndex;
-
-        if (this->currentIndex >= this->tokens.size() ||
-            (this->tokens[this->currentIndex]->type != TokenType::COMMA &&
-             this->tokens[this->currentIndex]->type != TokenType::CLOSING_ROUND_BRACKET))
+        if (toAdd)
         {
+            arguments.push_back(toAdd);
+        }
+
+        ++it;
+        if (it == this->tokens.end() ||
+            ((*it)->type != TokenType::COMMA &&
+             (*it)->type != TokenType::CLOSING_ROUND_BRACKET))
+        {
+            deallocateNodes(arguments);
             throw IllegalSyntaxException("Expected a comma or )", this->text);
         }
 
-        if (this->tokens[this->currentIndex]->type == TokenType::COMMA)
+        if ((*it)->type == TokenType::COMMA)
         {
-            ++this->currentIndex;
-            if (this->currentIndex >= this->tokens.size() || 
-                this->tokens[this->currentIndex]->type == TokenType::CLOSING_ROUND_BRACKET)
+            ++it;
+            if (it == this->tokens.end() || 
+                (*it)->type == TokenType::CLOSING_ROUND_BRACKET)
             {
+                deallocateNodes(arguments);
                 throw IllegalSyntaxException("Expected a number, list, function argument or another function", this->text);
             }
         }
     }
 
-    switch (arguments.size())
+    try 
     {
-    case 0:
-        return new ASTNode(functionName);
-    case 1:
-        return new ASTUnaryFunctionNode(functionName, arguments[0]);
-    case 2:
-        return new ASTBinaryFunctionNode(functionName, arguments[0], arguments[1]);
-    case 3:
-        return new ASTTernaryFunctionNode(functionName, arguments[0], arguments[1], arguments[2]);
-    default:
-        return new ASTN_aryFunctionNode(functionName, arguments);
+        switch (arguments.size())
+        {
+        case 0:
+            return new ASTNode(functionName);
+        case 1:
+            return new ASTUnaryFunctionNode(functionName, arguments[0]);
+        case 2:
+            return new ASTBinaryFunctionNode(functionName, arguments[0], arguments[1]);
+        case 3:
+            return new ASTTernaryFunctionNode(functionName, arguments[0], arguments[1], arguments[2]);
+        default:
+            return new ASTN_aryFunctionNode(functionName, arguments);
+        }
     }
+    catch(...)
+    {
+        deallocateNodes(arguments);
+        throw;
+    }
+    
 
     return nullptr;
 }
 
 ASTNode* Parser::parse()
 {
-    if (this->tokens.empty())
+    if (it == this->tokens.end())
     {
         return nullptr;
     }
-    else if (this->tokens[this->currentIndex]->type == TokenType::WHOLE_NUMBER ||
-             this->tokens[this->currentIndex]->type == TokenType::FRACTIONAL_NUMBER)
+    else if ((*it)->type == TokenType::WHOLE_NUMBER ||
+             (*it)->type == TokenType::FRACTIONAL_NUMBER)
     {
         return this->number();
     }
-    else if (this->tokens[this->currentIndex]->type == TokenType::OPENING_SQUARE_BRACKET)
+    else if ((*it)->type == TokenType::OPENING_SQUARE_BRACKET)
     {
         return this->list();
     }
-    else if (this->tokens[this->currentIndex]->type == TokenType::FUNCTION_NAME)
+    else if ((*it)->type == TokenType::FUNCTION_NAME)
     {
-        if (this->currentIndex + 1 >= this->tokens.size() ||
-            (this->tokens[this->currentIndex + 1]->type == TokenType::OPENING_ROUND_BRACKET &&
-             this->tokens[this->currentIndex + 1]->type == TokenType::ARROW))
+        ++it;
+        if (it == this->tokens.end() || ((*it)->type != TokenType::OPENING_ROUND_BRACKET && 
+                                         (*it)->type != TokenType::ARROW))
         {
             throw IllegalSyntaxException("Expected ( or ->", this->text);
         }
-        else if (this->tokens[this->currentIndex + 1]->type == TokenType::OPENING_ROUND_BRACKET)
+        else if ((*it)->type == TokenType::OPENING_ROUND_BRACKET)
         {
+            --it;
             return this->function();
         }
-        else
+        else 
         {
-            Token* functionName = this->tokens[this->currentIndex];
+            Token* functionName = *(it-1);
 
-            this->currentIndex += 2;
+            ++it;
             ASTNode* definition = nullptr;
-            switch (this->tokens[this->currentIndex]->type)
+            switch ((*it)->type)
             {
             case TokenType::WHOLE_NUMBER:
             case TokenType::FRACTIONAL_NUMBER:
@@ -211,12 +270,4 @@ ASTNode* Parser::parse()
     }
 
     throw IllegalSyntaxException("Invalid beginning. Expected a number, list or function name", this->text);
-}
-
-Parser::~Parser()
-{
-    for (Token* current : this->tokens)
-    {
-        delete current;
-    }
 }
