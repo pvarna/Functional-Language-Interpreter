@@ -30,7 +30,15 @@ add_library(ListFunc src/Utils/stringConverter.cpp
                      src/Interpreter/interpreter.cpp
                      src/ListFunc/listFunc.cpp)
                      
-target_include_directories(ListFunc PUBLIC headers/)
+target_include_directories(ListFunc PUBLIC headers/Exceptions
+                                           headers/Lexer
+                                           headers/Lexer/Tokens
+                                           headers/Parser
+                                           headers/Parser/Nodes
+                                           headers/Interpreter
+                                           headers/Interpreter/Literals
+                                           headers/ListFunc
+                                           headers/Utils)
 
 add_executable(ConsoleApp main.cpp)
 target_link_libraries(ConsoleApp ListFunc)
