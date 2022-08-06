@@ -10,3 +10,8 @@ std::string FunctionNameToken::toString() const
     result += this->name;
     return result;
 }
+
+Token* FunctionNameToken::clone() const
+{
+    return new FunctionNameToken(this->name);
+}

@@ -9,4 +9,5 @@ struct FractionalNumberToken : public Token
     FractionalNumberToken(const double value);
 
     virtual std::string toString() const override;
+    virtual Token* clone() const override;
 };

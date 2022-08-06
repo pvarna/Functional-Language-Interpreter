@@ -11,3 +11,8 @@ std::string ArgumentToken::toString() const
     result += StringConverter::intToString(this->index);
     return result;
 }
+
+Token* ArgumentToken::clone() const
+{
+    return new ArgumentToken(this->index);
+}

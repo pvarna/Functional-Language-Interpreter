@@ -9,4 +9,5 @@ struct WholeNumberToken : public Token
     WholeNumberToken(const int value);
 
     virtual std::string toString() const override;
+    virtual Token* clone() const override;
 };

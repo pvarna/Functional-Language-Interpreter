@@ -11,3 +11,8 @@ std::string FractionalNumberToken::toString() const
     result += StringConverter::doubleToString(this->value);
     return result;
 }
+
+Token* FractionalNumberToken::clone() const
+{
+    return new FractionalNumberToken(this->value);
+}

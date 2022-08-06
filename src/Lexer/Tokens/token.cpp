@@ -40,3 +40,8 @@ std::string Token::toString() const
         return "UNKNOWN";
     }
 }
+
+Token* Token::clone() const
+{
+    return new Token(this->type);
+}

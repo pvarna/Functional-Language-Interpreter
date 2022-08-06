@@ -9,4 +9,5 @@ struct FunctionNameToken : public Token
     FunctionNameToken(const std::string& name);
 
     virtual std::string toString() const override;
+    virtual Token* clone() const override;
 };

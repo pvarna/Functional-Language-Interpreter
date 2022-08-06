@@ -11,3 +11,8 @@ std::string WholeNumberToken::toString() const
     result += StringConverter::intToString(this->value);
     return result;
 }
+
+Token* WholeNumberToken::clone() const
+{
+    return new WholeNumberToken(this->value);
+}

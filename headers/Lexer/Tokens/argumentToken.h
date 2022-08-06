@@ -9,4 +9,5 @@ struct ArgumentToken : public Token
     ArgumentToken(const unsigned int index);
 
     virtual std::string toString() const override;
+    virtual Token* clone() const override;
 };
