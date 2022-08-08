@@ -9,4 +9,5 @@ struct WholeNumberLiteral : public Literal
     WholeNumberLiteral(const int value);
 
     virtual std::string toString() const override;
+    virtual WholeNumberLiteral* clone() const override;
 };

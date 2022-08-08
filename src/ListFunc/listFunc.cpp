@@ -1,6 +1,21 @@
 #include "listFunc.h"
 #include <iostream>
 
+void ListFunc::deallocateResources(std::vector<Token*>& tokens, ASTNode* tree)
+{
+    for (Token* token : tokens)
+    {
+        delete token;
+    }
+
+    tokens.clear();
+
+    if (tree)
+    {
+        delete tree;
+    }
+}
+
 ListFunc& ListFunc::getIstance()
 {
     static ListFunc object;
@@ -32,10 +47,7 @@ void ListFunc::run(std::ostream& out)
         }
         catch(std::exception& e)
         {
-            for (Token* current : tokens)
-            {
-                delete current;
-            }
+            deallocateResources(tokens);
             out << e.what() << std::endl << std::endl;
             continue;
         }
@@ -49,11 +61,7 @@ void ListFunc::run(std::ostream& out)
         }
         catch(const std::exception& e)
         {
-            for (Token* current : tokens)
-            {
-                delete current;
-            }
-            delete ast;
+            deallocateResources(tokens);
             out << e.what() << std::endl << std::endl;
             continue;
         }
@@ -64,7 +72,11 @@ void ListFunc::run(std::ostream& out)
         }
         catch(const std::exception& e)
         {
+            deallocateResources(tokens, ast);
             out << e.what() << std::endl << std::endl;
+            continue;
         }
+
+        deallocateResources(tokens, ast);
     }
 }

@@ -5,9 +5,18 @@
 
 struct UserDefinedListLiteral : public Literal
 {
-    std::list<double> elements;
+private:
+    void copy(const UserDefinedListLiteral& other);
+    void deallocate();
 
-    UserDefinedListLiteral(const std::list<double>& elements);
+public:
+    std::list<const Literal*> elements;
+
+    UserDefinedListLiteral(const std::list<const Literal*>& elements);
+    UserDefinedListLiteral(const UserDefinedListLiteral& other);
+    UserDefinedListLiteral& operator = (const UserDefinedListLiteral& other);
+    virtual ~UserDefinedListLiteral();
 
     virtual std::string toString() const override;
+    virtual UserDefinedListLiteral* clone() const override;
 };

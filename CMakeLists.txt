@@ -26,7 +26,8 @@ add_library(ListFunc src/Utils/stringConverter.cpp
                      src/Interpreter/Literals/wholeNumberLiteral.cpp
                      src/Interpreter/Literals/fractionalNumberLiteral.cpp
                      src/Interpreter/Literals/userDefinedListLiteral.cpp
-                     src/Interpreter/Literals/functionDefinedListLiteral.cpp
+                     src/Interpreter/Literals/finiteListLiteral.cpp
+                     src/Interpreter/Literals/infiniteListLiteral.cpp
                      src/Interpreter/interpreter.cpp
                      src/ListFunc/listFunc.cpp)
                      
@@ -43,8 +44,8 @@ target_include_directories(ListFunc PUBLIC headers/Exceptions
 add_executable(ConsoleApp main.cpp)
 target_link_libraries(ConsoleApp ListFunc)
 
-add_executable(Tests test/lexerTests.cpp test/parserTests.cpp test/interpreterTests.cpp)
-# add_executable(Tests test/parserTests.cpp)
+# add_executable(Tests test/lexerTests.cpp test/parserTests.cpp test/interpreterTests.cpp)
+add_executable(Tests test/lexerTests.cpp test/parserTests.cpp)
 target_link_libraries(Tests ListFunc)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "literalType.h"
-#include "stringConverter.h"
+#include <string>
 
 struct Literal
 {
@@ -9,8 +9,8 @@ struct Literal
 
     Literal(const LiteralType& type);
 
-    bool isNumber() const;
-    bool isList() const;
-
     virtual std::string toString() const = 0;
+    virtual Literal* clone() const = 0;
+
+    virtual ~Literal() = default;
 };

@@ -15,6 +15,7 @@
 #include "literal.h"
 #include <unordered_map>
 #include <stack>
+#include <list>
 
 /**
  * @class Interpreter
@@ -61,7 +62,9 @@ private:
     //! Function that determines which node should be visited at the moment
     void visit(const ASTNode* node);
 
-    void visitNumber(const ASTNode* node);
+    void visitWholeNumber(const ASTNode* node);
+    void visitFractionalNumber(const ASTNode* node);
+    void visitUserDefinedList(const ASTListNode* node);
     void visitList(const ASTListNode* node);
     void visitArgument(const ASTNode* node);
     void visitFunctionWithoutArguments(const ASTNode* node);

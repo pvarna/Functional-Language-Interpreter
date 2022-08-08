@@ -7,6 +7,8 @@
 class ListFunc
 {
 private:
+    void deallocateResources(std::vector<Token*>& tokens, ASTNode* tree = nullptr);
+
     Interpreter interpreter;
 
     ListFunc() = default;
@@ -14,6 +16,7 @@ private:
 public:
     ListFunc(const ListFunc& other) = delete;
     ListFunc& operator = (const ListFunc& other) = delete;
+    ~ListFunc() = default;
 
     static ListFunc& getIstance();
 

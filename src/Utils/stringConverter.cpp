@@ -26,13 +26,13 @@ std::string StringConverter::doubleToString(const double value)
     return result;
 }
 
-std::string StringConverter::listToString(const std::list<double>& values)
+std::string StringConverter::userDefinedListToString(const std::list<const Literal*>& values)
 {
     std::string result = "[";
 
-    for (double current : values)
+    for (const Literal* current : values)
     {
-        result += StringConverter::doubleToString(current) + " ";
+        result += current->toString() + " ";
     }
 
     if (result.back() != '[')
@@ -40,6 +40,45 @@ std::string StringConverter::listToString(const std::list<double>& values)
         result.pop_back();
     }
     result += "]";
+
+    return result;
+}
+
+std::string StringConverter::finiteListToString(const double firstElement, const double step, const int numberOfElements)
+{
+    std::string result = "[";
+    int counter = 0;
+    double currentElement = firstElement;
+
+    while (counter < numberOfElements)
+    {
+        result += doubleToString(currentElement) + " ";
+
+        ++counter;
+        currentElement += step;
+    }
+
+    if (result.back() != '[')
+    {
+        result.pop_back();
+    }
+    result += "]";
+
+    return result;
+}
+
+std::string StringConverter::infiniteListToString(const double firstElement, const double step, const int numberOfElementsToBePrinted)
+{
+    std::string result = "[";
+    double currentElement = firstElement;
+
+    for (int i = 0; i < numberOfElementsToBePrinted; ++i)
+    {
+        result += doubleToString(currentElement) + " ";
+        currentElement += step;
+    }
+
+    result += "...";
 
     return result;
 }

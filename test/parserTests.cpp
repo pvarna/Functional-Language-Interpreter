@@ -2,6 +2,7 @@
 #include "catch2/catch.hpp"
 #include "lexer.h"
 #include "parser.h"
+#include <iostream>
 
 void deallocate(std::vector<Token*>& tokens, ASTNode* tree = nullptr)
 {
@@ -229,5 +230,22 @@ TEST_CASE("Some illegal inputs")
         REQUIRE_THROWS(Parser(input, tokens).parse());
     
         deallocate(tokens);
+    }
+}
+
+TEST_CASE("TEST")
+{
+    SECTION("alo")
+    {
+        Lexer str("[read() read() read()]");
+        std::vector<Token*> tokens = str.tokenize();
+        REQUIRE(tokens.size() == 11);
+        
+        Parser parser("[read() read() read()]", tokens);
+        ASTNode* AST = parser.parse();
+    
+        std::cout << AST->toString() << std::endl;
+
+        deallocate(tokens, AST);
     }
 }

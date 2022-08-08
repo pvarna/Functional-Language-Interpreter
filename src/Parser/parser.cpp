@@ -67,9 +67,13 @@ ASTNode* Parser::list()
             case TokenType::OPENING_SQUARE_BRACKET:
                 toAdd = this->list();
                 break;
+            
+            case TokenType::FUNCTION_NAME:
+                toAdd = this->function();
+                break;
 
             default:
-                throw IllegalSyntaxException("Expected a number or another list", this->text);
+                throw IllegalSyntaxException("Expected number, list or function call", this->text);
             }
         }
         catch(...)
@@ -151,7 +155,7 @@ ASTNode* Parser::function()
                 break;
 
             default:
-                throw IllegalSyntaxException("Expected a number, list, function argument or another function", this->text);
+                throw IllegalSyntaxException("Expected number, list or function call", this->text);
             }
         }
         catch(...)
@@ -181,7 +185,7 @@ ASTNode* Parser::function()
                 (*it)->type == TokenType::CLOSING_ROUND_BRACKET)
             {
                 deallocateNodes(arguments);
-                throw IllegalSyntaxException("Expected a number, list, function argument or another function", this->text);
+                throw IllegalSyntaxException("Expected number, list or function call", this->text);
             }
         }
     }
@@ -262,12 +266,12 @@ ASTNode* Parser::parse()
                 break;
             
             default:
-                throw IllegalSyntaxException("Expected a number, list or function name", this->text);
+                throw IllegalSyntaxException("Expected a number, list or function call", this->text);
             }
 
             return new ASTUserFunctionNode(functionName, definition);
         }
     }
 
-    throw IllegalSyntaxException("Invalid beginning. Expected a number, list or function name", this->text);
+    throw IllegalSyntaxException("Invalid beginning. Expected a number, list or function call", this->text);
 }

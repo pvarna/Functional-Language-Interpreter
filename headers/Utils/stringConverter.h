@@ -1,5 +1,6 @@
 #pragma once
 
+#include "literal.h"
 #include <string>
 #include <list>
 
@@ -10,5 +11,7 @@ public:
 
     static std::string doubleToString(const double value);
 
-    static std::string listToString(const std::list<double>& values);
+    static std::string userDefinedListToString(const std::list<const Literal*>& elements);
+    static std::string finiteListToString(const double firstElement, const double step, const int numberOfElements);
+    static std::string infiniteListToString(const double firstElement, const double step, const int numberOfElementsToBePrinted);
 };
