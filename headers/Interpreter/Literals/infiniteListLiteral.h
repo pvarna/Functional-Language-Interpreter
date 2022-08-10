@@ -4,7 +4,7 @@
 
 struct InfiniteListLiteral : public ListLiteral
 {
-    static const int COUNT_OF_ELEMENTS_TO_BE_PRINTED = 5;
+    static const int COUNT_OF_ELEMENTS_TO_BE_PRINTED = 8;
 
     double firstElement;
     double step;

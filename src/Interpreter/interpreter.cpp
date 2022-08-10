@@ -463,6 +463,24 @@ void Interpreter::visitBinaryFunction(const ASTBinaryFunctionNode* node)
     {
         this->le(node);
     }
+    else if (functionName == "nand")
+    {
+        this->nand(node);
+    }
+    else if (functionName == "list")
+    {
+        this->list(node);
+    }
+    else if (functionName == "add" || functionName == "sub" ||
+             functionName == "mul" || functionName == "div" ||
+             functionName == "mod")
+    {
+        this->binaryArithmethic(node, functionName);
+    }
+    else
+    {
+        throw std::runtime_error("Unknown function name");
+    }
 }
 
 void Interpreter::concat(const ASTBinaryFunctionNode* node)
@@ -556,6 +574,153 @@ void Interpreter::le(const ASTBinaryFunctionNode* node)
     }
 
     this->visitedLiterals.push(new WholeNumberLiteral(firstNumber < secondNumber)); 
+    delete firstArgument;
+    delete secondArgument;
+}
+
+void Interpreter::nand(const ASTBinaryFunctionNode* node)
+{
+    this->visit(node->firstArgument);
+
+    const Literal* firstArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+
+    if (!firstArgument->toBool())
+    {
+        delete firstArgument;
+        this->visitedLiterals.push(new WholeNumberLiteral(true));
+        return;
+    }
+
+    this->visit(node->secondArgument);
+
+    const Literal* secondArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+
+    this->visitedLiterals.push(new WholeNumberLiteral(!firstArgument->toBool() || !secondArgument->toBool()));
+    delete firstArgument;
+    delete secondArgument;
+}
+
+void Interpreter::list(const ASTBinaryFunctionNode* node)
+{
+    this->visit(node->firstArgument);
+
+    const Literal* firstArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+    double firstNumber;
+
+    try
+    {
+        firstNumber = Literal::valueOf(firstArgument);
+    }
+    catch(...)
+    {
+        delete firstArgument;
+        throw std::runtime_error("Expected two numbers for the \'list\' function");
+    }
+
+    this->visit(node->secondArgument);
+
+    const Literal* secondArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+    double secondNumber;
+
+    try
+    {
+        secondNumber = Literal::valueOf(secondArgument);
+    }
+    catch(...)
+    {
+        delete firstArgument;
+        delete secondArgument;
+        throw std::runtime_error("Expected two numbers for the \'list\' function");
+    } 
+
+    this->visitedLiterals.push(new InfiniteListLiteral(firstNumber, secondNumber));
+}
+
+void Interpreter::binaryArithmethic(const ASTBinaryFunctionNode* node, const std::string& functionName)
+{
+    this->visit(node->firstArgument);
+
+    const Literal* firstArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+    double firstNumber;
+
+    try
+    {
+        firstNumber = Literal::valueOf(firstArgument);
+    }
+    catch(...)
+    {
+        delete firstArgument;
+        throw std::runtime_error("Expected two numbers for the \'" + functionName +"\' function");
+    }
+
+    if (functionName == "mod" && firstArgument->type != LiteralType::WHOLE_NUMBER)
+    {
+        delete firstArgument;
+        throw std::runtime_error("Expected two whole numbers for the \'" + functionName +"\' function");
+    }
+
+    this->visit(node->secondArgument);
+
+    const Literal* secondArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+    double secondNumber;
+
+    try
+    {
+        secondNumber = Literal::valueOf(secondArgument);
+    }
+    catch(...)
+    {
+        delete firstArgument;
+        delete secondArgument;
+        throw std::runtime_error("Expected two numbers for the \'" + functionName +"\' function");
+    }
+
+    if (functionName == "mod" && secondArgument->type != LiteralType::WHOLE_NUMBER)
+    {
+        delete firstArgument;
+        delete secondArgument;
+        throw std::runtime_error("Expected two whole numbers for the \'" + functionName +"\' function");
+    }
+
+    if (functionName == "mod")
+    {
+        int result = static_cast<int>(firstNumber) % static_cast<int>(secondNumber);
+
+        this->visitedLiterals.push(new WholeNumberLiteral(result));
+        delete firstArgument;
+        delete secondArgument;
+        return; 
+    }
+
+    double result;
+    if (functionName == "add")
+    {
+        result = firstNumber + secondNumber;
+    }
+    else if (functionName == "sub")
+    {
+        result = firstNumber - secondNumber;
+    }
+    else if (functionName == "mul")
+    {
+        result = firstNumber * secondNumber;
+    }
+    else if (functionName == "div")
+    {
+        if (std::abs(secondNumber - 0) < Utils::EPS)
+        {
+            throw std::runtime_error("Cannot divide by 0");
+        }
+        result = firstNumber / secondNumber;
+    }
+
+    this->visitedLiterals.push(Literal::of(result));
     delete firstArgument;
     delete secondArgument;
 }

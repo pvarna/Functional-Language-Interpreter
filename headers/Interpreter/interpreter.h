@@ -47,6 +47,8 @@ private:
     void eq(const ASTBinaryFunctionNode* node);
     void le(const ASTBinaryFunctionNode* node);
     void nand(const ASTBinaryFunctionNode* node);
+    void list(const ASTBinaryFunctionNode* node);
+    void binaryArithmethic(const ASTBinaryFunctionNode* node, const std::string& functionName);
 
     //! FUNCTIONS FOR IMPLEMENTING THE VISITOR PATTERN
 
