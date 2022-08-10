@@ -18,3 +18,8 @@ int WholeNumberLiteral::length() const
 {
     return -1;
 }
+
+bool WholeNumberLiteral::toBool() const
+{
+    return this->value != 0;
+}

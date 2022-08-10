@@ -23,35 +23,12 @@
 class Interpreter
 {
 private:
-    static const double EPS; //!< a const for the double comparison
-
     std::stack<const Literal*> visitedLiterals; //!< stores the already visited literals
     std::vector<const Literal*> userArguments; //!< stores the user arguments for the user-defined functions
     std::unordered_map<std::string, const ASTNode*> userFunctions; //!< stores the user-defined functions and their definitions
 
     //! Helper function for deallocating the allocated memory for the literals
     void deallocate();
-
-    //! Helper function for checking if a number is a whole number
-    bool isInt(double value);
-
-    //! Helper function for checking if a list in infinite
-    bool isInfiniteList(const Literal* list);
-
-    //! Helper function for getting a physical list from a literal
-    std::list<double> getList(const Literal* list);
-
-    //! Helper function for making a deep copy of a literal
-    const Literal* copy(const Literal* toCopy);
-
-    //! Helper function for getting the value of a number literal
-    double getNumber(const Literal* number);
-
-    //! Helper function for checking the equality of two lists
-    bool compareLists(const Literal* list1, const Literal* list2);
-
-    //! Helper function for checking the equality of a number and the first element of a list
-    bool compareNumberAndList(const Literal* number, const Literal* list);
 
     //! Helper function for adding a new user-defined function
     void addToUserFunctions(const std::string& name, const ASTNode* definition);
@@ -67,6 +44,9 @@ private:
     void toInt(const ASTUnaryFunctionNode* node);
 
     void concat(const ASTBinaryFunctionNode* node);
+    void eq(const ASTBinaryFunctionNode* node);
+    void le(const ASTBinaryFunctionNode* node);
+    void nand(const ASTBinaryFunctionNode* node);
 
     //! FUNCTIONS FOR IMPLEMENTING THE VISITOR PATTERN
 

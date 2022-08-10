@@ -35,3 +35,8 @@ bool InfiniteListLiteral::isInfinite() const
 {
     return true;
 }
+
+bool InfiniteListLiteral::toBool() const
+{
+    return true;
+}

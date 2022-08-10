@@ -12,4 +12,5 @@ struct FractionalNumberLiteral : public Literal
     virtual FractionalNumberLiteral* clone() const override;
 
     virtual int length() const override;
+    virtual bool toBool() const override;
 };

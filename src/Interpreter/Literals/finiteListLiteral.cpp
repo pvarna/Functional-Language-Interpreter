@@ -46,3 +46,8 @@ bool FiniteListLiteral::isInfinite() const
 {
     return false;
 }
+
+bool FiniteListLiteral::toBool() const
+{
+    return this->numberOfElements == 0;
+}

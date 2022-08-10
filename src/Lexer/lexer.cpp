@@ -7,8 +7,7 @@
 #include "wholeNumberToken.h"
 #include "functionNameToken.h"
 #include "argumentToken.h"
-
-const double Lexer::EPS = 0.00001;
+#include "utils.h"
 
 Lexer::Lexer(const std::string& text) : text(text) {}
 
@@ -63,7 +62,7 @@ double Lexer::getNumber(std::string::iterator& it, bool isNegative, bool& isFrac
         }
     }
 
-    if (isFractional && std::abs(decimalPart - 0) < EPS)
+    if (isFractional && std::abs(decimalPart - 0) < Utils::EPS)
     {
         isFractional = false;
     }
@@ -199,6 +198,11 @@ Token* Lexer::argument(std::string::iterator& it)
 
 std::vector<Token*> Lexer::tokenize()
 {
+    if (this->text.empty())
+    {
+        throw std::runtime_error("Empty line");
+    }
+
     std::vector<Token*> tokens;
     std::stack<char> brackets;
 

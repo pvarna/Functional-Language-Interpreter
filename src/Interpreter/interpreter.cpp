@@ -11,8 +11,6 @@
 #include <iostream>
 #include <cmath>
 
-const double Interpreter::EPS = 0.00001;
-
 void Interpreter::deallocate()
 {
     while (!this->visitedLiterals.empty())
@@ -258,15 +256,12 @@ void Interpreter::sqrt(const ASTUnaryFunctionNode* node)
 
     double result;
 
-    switch (argument->type)
+    try
     {
-    case LiteralType::WHOLE_NUMBER:
-        result = dynamic_cast<const WholeNumberLiteral*>(argument)->value;
-        break;
-    case LiteralType::FRACTIONAL_NUMBER:
-        result = dynamic_cast<const FractionalNumberLiteral*>(argument)->value;
-        break;
-    default:
+        result = Literal::valueOf(argument);
+    }
+    catch(...)
+    {
         delete argument;
         throw std::runtime_error("Expected a number for the \'sqrt\' function");
     }
@@ -377,15 +372,12 @@ void Interpreter::list(const ASTUnaryFunctionNode* node)
     
     double firstElement;
 
-    switch (argument->type)
+    try
     {
-    case LiteralType::WHOLE_NUMBER:
-        firstElement = dynamic_cast<const WholeNumberLiteral*>(argument)->value;
-        break;
-    case LiteralType::FRACTIONAL_NUMBER:
-        firstElement = dynamic_cast<const FractionalNumberLiteral*>(argument)->value;
-        break;
-    default:
+        firstElement = Literal::valueOf(argument);
+    }
+    catch(...)
+    {
         delete argument;
         throw std::runtime_error("Expected a number for the \'list\' function");
     }
@@ -423,15 +415,12 @@ void Interpreter::toInt(const ASTUnaryFunctionNode* node)
 
     double result;
 
-    switch (argument->type)
+    try
     {
-    case LiteralType::WHOLE_NUMBER:
-        result = dynamic_cast<const WholeNumberLiteral*>(argument)->value;
-        break;
-    case LiteralType::FRACTIONAL_NUMBER:
-        result = dynamic_cast<const FractionalNumberLiteral*>(argument)->value;
-        break;
-    default:
+        result = Literal::valueOf(argument);
+    }
+    catch(...)
+    {
         delete argument;
         throw std::runtime_error("Expected a number for the \'int\' function");
     }
@@ -448,6 +437,9 @@ void Interpreter::visitBinaryFunction(const ASTBinaryFunctionNode* node)
 
     if (this->userFunctions.count(functionName) != 0)
     {
+        this->visit(node->firstArgument);
+        this->visit(node->secondArgument);
+
         const Literal* second = this->visitedLiterals.top();
         this->visitedLiterals.pop();
         const Literal* first = this->visitedLiterals.top();
@@ -463,7 +455,14 @@ void Interpreter::visitBinaryFunction(const ASTBinaryFunctionNode* node)
     {
         this->concat(node);
     }
-    
+    else if (functionName == "eq")
+    {
+        this->eq(node);
+    }
+    else if (functionName == "le")
+    {
+        this->le(node);
+    }
 }
 
 void Interpreter::concat(const ASTBinaryFunctionNode* node)
@@ -504,4 +503,59 @@ void Interpreter::concat(const ASTBinaryFunctionNode* node)
     this->visitedLiterals.push(new ConcatenatedListLiteral(firstList, secondList));
     delete firstList;
     delete secondList;
+}
+
+void Interpreter::eq(const ASTBinaryFunctionNode* node)
+{
+    this->visit(node->firstArgument);
+    this->visit(node->secondArgument);
+
+    const Literal* second = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+    const Literal* first = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+
+    this->visitedLiterals.push(new WholeNumberLiteral(Literal::eq(first, second)));
+    delete first;
+    delete second;
+}
+
+void Interpreter::le(const ASTBinaryFunctionNode* node)
+{
+    this->visit(node->firstArgument);
+
+    const Literal* firstArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+    double firstNumber;
+
+    try
+    {
+        firstNumber = Literal::valueOf(firstArgument);
+    }
+    catch(...)
+    {
+        delete firstArgument;
+        throw std::runtime_error("Expected two numbers for the \'le\' function");
+    }
+
+    this->visit(node->secondArgument);
+
+    const Literal* secondArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+    double secondNumber;
+
+    try
+    {
+        secondNumber = Literal::valueOf(secondArgument);
+    }
+    catch(...)
+    {
+        delete firstArgument;
+        delete secondArgument;
+        throw std::runtime_error("Expected two numbers for the \'le\' function");
+    }
+
+    this->visitedLiterals.push(new WholeNumberLiteral(firstNumber < secondNumber)); 
+    delete firstArgument;
+    delete secondArgument;
 }

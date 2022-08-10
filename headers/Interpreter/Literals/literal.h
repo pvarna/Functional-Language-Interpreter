@@ -14,7 +14,10 @@ struct Literal
 
     virtual ~Literal() = default;
 
-    virtual int length() const = 0; 
+    virtual int length() const = 0;
+    virtual bool toBool() const = 0; 
 
     static Literal* of(const double number);
+    static bool eq(const Literal* first, const Literal* second);
+    static double valueOf(const Literal* literal);
 };

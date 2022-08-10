@@ -17,4 +17,5 @@ struct FiniteListLiteral : public ListLiteral
     virtual FiniteListLiteral* tail() const override; 
     virtual int length() const override;
     virtual bool isInfinite() const override;
+    virtual bool toBool() const override;
 };

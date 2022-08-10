@@ -43,7 +43,10 @@ std::string ConcatenatedListLiteral::toString() const
 {
     std::string result = first->toString();
     result.pop_back();
-    result += " ";
+    if (second->length() != 0)
+    {
+        result += " ";
+    }
     result += second->toString().substr(1);
 
     return result;
@@ -89,4 +92,9 @@ int ConcatenatedListLiteral::length() const
 bool ConcatenatedListLiteral::isInfinite() const
 {
     return this->first->isInfinite() || this->second->isInfinite();
+}
+
+bool ConcatenatedListLiteral::toBool() const
+{
+    return this->first->toBool() || this->second->toBool();
 }

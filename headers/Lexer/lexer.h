@@ -17,8 +17,6 @@
 class Lexer
 {
 private:
-    static const double EPS; //!< helper constant for correct double comparison
-
     std::string text; //!< stores the input that should be tokenized
 
     //! Helper function for deallocating the allocated tokens if an exception occurres

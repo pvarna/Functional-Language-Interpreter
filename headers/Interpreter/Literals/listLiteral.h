@@ -12,4 +12,5 @@ public:
     virtual Literal* head() const = 0;
     virtual ListLiteral* tail() const = 0; 
     virtual bool isInfinite() const = 0;
+    virtual bool toBool() const = 0;
 };

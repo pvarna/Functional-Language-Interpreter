@@ -12,4 +12,5 @@ struct WholeNumberLiteral : public Literal
     virtual WholeNumberLiteral* clone() const override;
 
     virtual int length() const override;
+    virtual bool toBool() const override;
 };

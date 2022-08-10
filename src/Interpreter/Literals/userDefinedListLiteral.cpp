@@ -99,3 +99,8 @@ bool UserDefinedListLiteral::isInfinite() const
 {
     return false;
 }
+
+bool UserDefinedListLiteral::toBool() const
+{
+    return this->elements.size() > 0;
+}
