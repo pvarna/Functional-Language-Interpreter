@@ -1,8 +1,8 @@
 #pragma once
 
-#include "literal.h"
+#include "listLiteral.h"
 
-struct InfiniteListLiteral : public Literal
+struct InfiniteListLiteral : public ListLiteral
 {
     static const int COUNT_OF_ELEMENTS_TO_BE_PRINTED = 5;
 
@@ -13,4 +13,8 @@ struct InfiniteListLiteral : public Literal
 
     virtual std::string toString() const override;
     virtual InfiniteListLiteral* clone() const override;
+
+    virtual Literal* head() const override;
+    virtual InfiniteListLiteral* tail() const override;
+    virtual int length() const override;
 };

@@ -10,4 +10,6 @@ struct FractionalNumberLiteral : public Literal
 
     virtual std::string toString() const override;
     virtual FractionalNumberLiteral* clone() const override;
+
+    virtual int length() const override;
 };

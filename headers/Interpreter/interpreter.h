@@ -56,6 +56,12 @@ private:
     //! Helper function for adding a new user-defined function
     void addToUserFunctions(const std::string& name, const ASTNode* definition);
 
+    void read();
+    void sqrt(const Literal* argument);
+    void head(const Literal* argument);
+    void tail(const Literal* argument);
+    void length(const Literal* argument);
+    void list(const Literal* argument);
 
     //! FUNCTIONS FOR IMPLEMENTING THE VISITOR PATTERN
 
@@ -67,6 +73,7 @@ private:
     void visitUserDefinedList(const ASTListNode* node);
     void visitList(const ASTListNode* node);
     void visitArgument(const ASTNode* node);
+    void visitFunction(const ASTNode* node);
     void visitFunctionWithoutArguments(const ASTNode* node);
     void visitUnaryFunction(const ASTUnaryFunctionNode* node);
     void visitBinaryFunction(const ASTBinaryFunctionNode* node);

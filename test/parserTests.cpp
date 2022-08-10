@@ -237,14 +237,15 @@ TEST_CASE("TEST")
 {
     SECTION("alo")
     {
-        Lexer str("[read() read() read()]");
+        Lexer str("read()");
         std::vector<Token*> tokens = str.tokenize();
-        REQUIRE(tokens.size() == 11);
+        REQUIRE(tokens.size() == 3);
         
-        Parser parser("[read() read() read()]", tokens);
+        Parser parser("read()", tokens);
         ASTNode* AST = parser.parse();
     
         std::cout << AST->toString() << std::endl;
+        std::cout << typeid(*AST).name() << std::endl;
 
         deallocate(tokens, AST);
     }

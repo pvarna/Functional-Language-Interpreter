@@ -1,8 +1,8 @@
 #pragma once
 
-#include "literal.h"
+#include "listLiteral.h"
 
-struct FiniteListLiteral : public Literal
+struct FiniteListLiteral : public ListLiteral
 {
     double firstElement;
     double step;
@@ -12,4 +12,8 @@ struct FiniteListLiteral : public Literal
 
     virtual std::string toString() const override;
     virtual FiniteListLiteral* clone() const override;
+
+    virtual Literal* head() const override;
+    virtual FiniteListLiteral* tail() const override; 
+    virtual int length() const override;
 };

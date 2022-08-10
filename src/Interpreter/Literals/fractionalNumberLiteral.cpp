@@ -13,3 +13,8 @@ FractionalNumberLiteral* FractionalNumberLiteral::clone() const
 {
     return new FractionalNumberLiteral(this->value);
 }
+
+int FractionalNumberLiteral::length() const
+{
+    return -1;
+}

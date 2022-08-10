@@ -20,7 +20,7 @@ void UserDefinedListLiteral::deallocate()
 }
 
 UserDefinedListLiteral::UserDefinedListLiteral(const std::list<const Literal*>& elements)
-    : Literal(LiteralType::USER_DEFINED_LIST)
+    : ListLiteral(LiteralType::USER_DEFINED_LIST)
 {
     for (const Literal* current : elements)
     {
@@ -29,7 +29,7 @@ UserDefinedListLiteral::UserDefinedListLiteral(const std::list<const Literal*>& 
 }
 
 UserDefinedListLiteral::UserDefinedListLiteral(const UserDefinedListLiteral& other)
-    : Literal(other)
+    : ListLiteral(other)
 {
     this->copy(other);
 }
@@ -39,7 +39,7 @@ UserDefinedListLiteral& UserDefinedListLiteral::operator = (const UserDefinedLis
     if (this != &other)
     {
         this->deallocate();
-        Literal::operator=(other);
+        ListLiteral::operator=(other);
         this->copy(other);
     }
 
@@ -59,4 +59,38 @@ std::string UserDefinedListLiteral::toString() const
 UserDefinedListLiteral* UserDefinedListLiteral::clone() const
 {
     return new UserDefinedListLiteral(this->elements);
+}
+
+Literal* UserDefinedListLiteral::head() const
+{
+    if (this->elements.empty())
+    {
+        return nullptr;
+    }
+
+    return this->elements.front()->clone();
+}
+
+UserDefinedListLiteral* UserDefinedListLiteral::tail() const
+{
+    if (this->elements.empty())
+    {
+        return nullptr;
+    }
+
+    std::list<const Literal*>::const_iterator begin = this->elements.begin();
+    ++begin;
+
+    std::list<const Literal*> elements;
+    for (std::list<const Literal*>::const_iterator it = begin; it != this->elements.end(); ++it)
+    {
+        elements.push_back(*it);
+    }
+
+    return new UserDefinedListLiteral(elements);
+}
+
+int UserDefinedListLiteral::length() const
+{
+    return this->elements.size();
 }

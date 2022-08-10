@@ -1,9 +1,9 @@
 #pragma once
 
-#include "literal.h"
+#include "listLiteral.h"
 #include <list>
 
-struct UserDefinedListLiteral : public Literal
+struct UserDefinedListLiteral : public ListLiteral
 {
 private:
     void copy(const UserDefinedListLiteral& other);
@@ -19,4 +19,8 @@ public:
 
     virtual std::string toString() const override;
     virtual UserDefinedListLiteral* clone() const override;
+
+    virtual Literal* head() const override;
+    virtual UserDefinedListLiteral* tail() const override;
+    virtual int length() const override;
 };

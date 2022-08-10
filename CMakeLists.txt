@@ -5,6 +5,7 @@ include(CTest)
 enable_testing()
 
 add_library(ListFunc src/Utils/stringConverter.cpp
+                     src/Utils/utils.cpp
                      src/Exceptions/illegalCharacterException.cpp
                      src/Exceptions/missingCharacterException.cpp
                      src/Exceptions/illegalSyntaxException.cpp
@@ -23,6 +24,7 @@ add_library(ListFunc src/Utils/stringConverter.cpp
                      src/Parser/Nodes/ASTListNode.cpp
                      src/Parser/parser.cpp
                      src/Interpreter/Literals/literal.cpp
+                     src/Interpreter/Literals/listLiteral.cpp
                      src/Interpreter/Literals/wholeNumberLiteral.cpp
                      src/Interpreter/Literals/fractionalNumberLiteral.cpp
                      src/Interpreter/Literals/userDefinedListLiteral.cpp

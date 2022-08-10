@@ -13,4 +13,8 @@ struct Literal
     virtual Literal* clone() const = 0;
 
     virtual ~Literal() = default;
+
+    virtual int length() const = 0; 
+
+    static Literal* of(const double number);
 };

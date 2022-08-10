@@ -13,3 +13,8 @@ WholeNumberLiteral* WholeNumberLiteral::clone() const
 {
     return new WholeNumberLiteral(this->value);
 }
+
+int WholeNumberLiteral::length() const
+{
+    return -1;
+}
