@@ -28,5 +28,10 @@ InfiniteListLiteral* InfiniteListLiteral::tail() const
 
 int InfiniteListLiteral::length() const
 {
-    throw std::runtime_error("Length is only defined for finite lists");
+    throw std::runtime_error("The length of an infinite list is undefined");
+}
+
+bool InfiniteListLiteral::isInfinite() const
+{
+    return true;
 }

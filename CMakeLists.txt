@@ -30,6 +30,7 @@ add_library(ListFunc src/Utils/stringConverter.cpp
                      src/Interpreter/Literals/userDefinedListLiteral.cpp
                      src/Interpreter/Literals/finiteListLiteral.cpp
                      src/Interpreter/Literals/infiniteListLiteral.cpp
+                     src/Interpreter/Literals/concatenatedListLiteral.cpp
                      src/Interpreter/interpreter.cpp
                      src/ListFunc/listFunc.cpp)
                      

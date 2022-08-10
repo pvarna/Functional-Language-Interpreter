@@ -19,15 +19,30 @@ FiniteListLiteral* FiniteListLiteral::clone() const
 
 Literal* FiniteListLiteral::head() const
 {
+    if (this->numberOfElements == 0)
+    {
+        return nullptr;
+    }
+
     return Literal::of(this->firstElement);
 }
 
 FiniteListLiteral* FiniteListLiteral::tail() const
 {
+    if (this->numberOfElements == 0)
+    {
+        return nullptr;
+    }
+
     return new FiniteListLiteral(this->firstElement + this->step, this->step, this->numberOfElements - 1);
 }
 
 int FiniteListLiteral::length() const
 {
     return this->numberOfElements;
+}
+
+bool FiniteListLiteral::isInfinite() const
+{
+    return false;
 }

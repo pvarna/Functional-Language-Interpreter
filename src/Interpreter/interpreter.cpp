@@ -7,6 +7,7 @@
 #include "userDefinedListLiteral.h"
 #include "functionNameToken.h"
 #include "infiniteListLiteral.h"
+#include "concatenatedListLiteral.h"
 #include <iostream>
 #include <cmath>
 
@@ -150,11 +151,11 @@ void Interpreter::visitFunction(const ASTNode* node)
     }
     else if (typeid(*node) == typeid(ASTUnaryFunctionNode))
     {
-        const ASTUnaryFunctionNode* unaryFunctionNode = dynamic_cast<const ASTUnaryFunctionNode*>(node);
-        const ASTNode* argument = unaryFunctionNode->argument;
-
-        this->visit(argument);
-        this->visitUnaryFunction(unaryFunctionNode);
+        this->visitUnaryFunction(dynamic_cast<const ASTUnaryFunctionNode*>(node));
+    }
+    else if (typeid(*node) == typeid(ASTBinaryFunctionNode))
+    {
+        this->visitBinaryFunction(dynamic_cast<const ASTBinaryFunctionNode*>(node));
     }
 }
 
@@ -203,50 +204,58 @@ void Interpreter::visitUnaryFunction(const ASTUnaryFunctionNode* node)
 {
     const FunctionNameToken* token = dynamic_cast<const FunctionNameToken*>(node->token);
 
-    const Literal* top = this->visitedLiterals.top();
-    this->visitedLiterals.pop();
-
     std::string functionName = token->name;
 
-    try
+    if (this->userFunctions.count(functionName) != 0)
     {
-        if (this->userFunctions.count(functionName) != 0)
-        {
-            this->userArguments.push_back(top->clone());
-            this->visit(this->userFunctions[functionName]);
-        }
-        else if (functionName == "sqrt")
-        {
-            this->sqrt(top);
-        }
-        else if (functionName == "head")
-        {
-            this->head(top);
-        }
-        else if (functionName == "tail")
-        {
-            this->tail(top);
-        }
-        else if (functionName == "length")
-        {
-            this->length(top);
-        }
-        else if (functionName == "list")
-        {
-            this->list(top);
-        }
-    }
-    catch(...)
-    {
-       delete top;
-       throw;
-    }
+        const Literal* top = this->visitedLiterals.top();
+        this->visitedLiterals.pop();
 
-    delete top;
+        this->userArguments.push_back(top->clone());
+        this->visit(this->userFunctions[functionName]);
+        delete top;
+    }
+    else if (functionName == "sqrt")
+    {
+        this->sqrt(node);
+    }
+    else if (functionName == "head")
+    {
+        this->head(node);
+    }
+    else if (functionName == "tail")
+    {
+        this->tail(node);
+    }
+    else if (functionName == "length")
+    {
+        this->length(node);
+    }
+    else if (functionName == "list")
+    {
+        this->list(node);
+    }
+    else if (functionName == "write")
+    {
+        this->write(node);
+    }
+    else if (functionName == "int")
+    {   
+        this->toInt(node);
+    }
+    else
+    {
+        throw std::runtime_error("Unknown function name");
+    }
 }
 
-void Interpreter::sqrt(const Literal* argument)
+void Interpreter::sqrt(const ASTUnaryFunctionNode* node)
 {
+    this->visit(node->argument);
+
+    const Literal* argument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+
     double result;
 
     switch (argument->type)
@@ -258,55 +267,91 @@ void Interpreter::sqrt(const Literal* argument)
         result = dynamic_cast<const FractionalNumberLiteral*>(argument)->value;
         break;
     default:
+        delete argument;
         throw std::runtime_error("Expected a number for the \'sqrt\' function");
     }
 
     if (result < 0)
     {
+        delete argument;
         throw std::runtime_error("Expected a non-negative number for the \'sqrt\' function");
     }
 
     this->visitedLiterals.push(Literal::of(std::sqrt(result)));
+    delete argument;
 }
 
-void Interpreter::head(const Literal* argument)
+void Interpreter::head(const ASTUnaryFunctionNode* node)
 {
+    if (node->argument->token->type == TokenType::OPENING_SQUARE_BRACKET)
+    {
+        const ASTListNode* listNode = dynamic_cast<const ASTListNode*>(node->argument);
+        if (listNode->elements.empty())
+        {
+            throw std::runtime_error("Expected non-empty list for the \'head\' function");
+        }
+
+        this->visit(listNode->elements.front());
+        return;
+    }
+
+    this->visit(node->argument);
+
+    const Literal* argument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+
     const ListLiteral* listLiteral = dynamic_cast<const ListLiteral*>(argument);
 
     if (!listLiteral)
     {
+        delete argument;
         throw std::runtime_error("Expected a list for the \'head\' function");
     }
 
     Literal* toAdd = listLiteral->head();
     if (!toAdd)
     {
+        delete argument;
         throw std::runtime_error("Expected non-empty list for the \'head\' function");
     }
 
     this->visitedLiterals.push(toAdd);
+    delete argument;
 }
 
-void Interpreter::tail(const Literal* argument)
+void Interpreter::tail(const ASTUnaryFunctionNode* node)
 {
+    this->visit(node->argument);
+
+    const Literal* argument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+
     const ListLiteral* listLiteral = dynamic_cast<const ListLiteral*>(argument);
 
     if (!listLiteral)
     {
+        delete argument;
         throw std::runtime_error("Expected a list for the \'tail\' function");
     }
 
     ListLiteral* toAdd = listLiteral->tail();
     if (!toAdd)
     {
+        delete argument;
         throw std::runtime_error("Expected non-empty list for the \'tail\' function");
     }
 
     this->visitedLiterals.push(toAdd); 
+    delete argument;
 }
 
-void Interpreter::length(const Literal* argument)
+void Interpreter::length(const ASTUnaryFunctionNode* node)
 {
+    this->visit(node->argument);
+
+    const Literal* argument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+
     int length;
 
     try
@@ -315,14 +360,21 @@ void Interpreter::length(const Literal* argument)
     }
     catch(...)
     {
-        throw std::runtime_error("Not expected infinite list for the \'length\' function");
+        delete argument;
+        throw;
     }
-
-    this->visitedLiterals.push(new WholeNumberLiteral(length));   
+    
+    this->visitedLiterals.push(new WholeNumberLiteral(length));
+    delete argument;   
 }
 
-void Interpreter::list(const Literal* argument)
+void Interpreter::list(const ASTUnaryFunctionNode* node)
 {
+    this->visit(node->argument);
+
+    const Literal* argument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+    
     double firstElement;
 
     switch (argument->type)
@@ -334,8 +386,122 @@ void Interpreter::list(const Literal* argument)
         firstElement = dynamic_cast<const FractionalNumberLiteral*>(argument)->value;
         break;
     default:
+        delete argument;
         throw std::runtime_error("Expected a number for the \'list\' function");
     }
 
     this->visitedLiterals.push(new InfiniteListLiteral(firstElement));
+    delete argument;
+}
+
+void Interpreter::write(const ASTUnaryFunctionNode* node)
+{
+    try
+    {
+        this->visit(node->argument);
+    }
+    catch(...)
+    {
+        this->visitedLiterals.push(new WholeNumberLiteral(-1));
+        return;
+    }
+
+    const Literal* argument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+
+    std::cout << argument->toString() << std::endl;
+    this->visitedLiterals.push(new WholeNumberLiteral(0));
+    delete argument;    
+}
+
+void Interpreter::toInt(const ASTUnaryFunctionNode* node)
+{
+    this->visit(node->argument);
+
+    const Literal* argument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+
+    double result;
+
+    switch (argument->type)
+    {
+    case LiteralType::WHOLE_NUMBER:
+        result = dynamic_cast<const WholeNumberLiteral*>(argument)->value;
+        break;
+    case LiteralType::FRACTIONAL_NUMBER:
+        result = dynamic_cast<const FractionalNumberLiteral*>(argument)->value;
+        break;
+    default:
+        delete argument;
+        throw std::runtime_error("Expected a number for the \'int\' function");
+    }
+
+    this->visitedLiterals.push(Literal::of(static_cast<int>(result)));
+    delete argument;
+}
+
+void Interpreter::visitBinaryFunction(const ASTBinaryFunctionNode* node)
+{
+    const FunctionNameToken* token = dynamic_cast<const FunctionNameToken*>(node->token);
+
+    std::string functionName = token->name;
+
+    if (this->userFunctions.count(functionName) != 0)
+    {
+        const Literal* second = this->visitedLiterals.top();
+        this->visitedLiterals.pop();
+        const Literal* first = this->visitedLiterals.top();
+        this->visitedLiterals.pop();
+
+        this->userArguments.push_back(first->clone());
+        this->userArguments.push_back(second->clone());
+        this->visit(this->userFunctions[functionName]);
+        delete first;
+        delete second;
+    }
+    else if (functionName == "concat")
+    {
+        this->concat(node);
+    }
+    
+}
+
+void Interpreter::concat(const ASTBinaryFunctionNode* node)
+{
+    this->visit(node->firstArgument);
+
+    const Literal* firstArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+
+    const ListLiteral* firstList = dynamic_cast<const ListLiteral*>(firstArgument);
+
+    if (!firstList)
+    {
+        delete firstArgument;
+        throw std::runtime_error("Expected two lists for the \'concat\' function");
+    }
+
+    if (firstList->isInfinite())
+    {
+        delete firstArgument;
+        throw std::runtime_error("Expected a finite list as a first parameter for the \'concat\' function");
+    }
+
+    this->visit(node->secondArgument);
+
+    const Literal* secondArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+
+    const ListLiteral* secondList = dynamic_cast<const ListLiteral*>(secondArgument);
+
+    if (!secondList)
+    {
+        delete firstArgument;
+        delete secondArgument;
+        throw std::runtime_error("Expected two lists for the \'concat\' function");
+    }
+
+    this->visitedLiterals.push(new ConcatenatedListLiteral(firstList, secondList));
+    delete firstList;
+    delete secondList;
 }

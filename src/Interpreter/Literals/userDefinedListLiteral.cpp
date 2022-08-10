@@ -58,7 +58,7 @@ std::string UserDefinedListLiteral::toString() const
 
 UserDefinedListLiteral* UserDefinedListLiteral::clone() const
 {
-    return new UserDefinedListLiteral(this->elements);
+    return new UserDefinedListLiteral(*this);
 }
 
 Literal* UserDefinedListLiteral::head() const
@@ -93,4 +93,9 @@ UserDefinedListLiteral* UserDefinedListLiteral::tail() const
 int UserDefinedListLiteral::length() const
 {
     return this->elements.size();
+}
+
+bool UserDefinedListLiteral::isInfinite() const
+{
+    return false;
 }

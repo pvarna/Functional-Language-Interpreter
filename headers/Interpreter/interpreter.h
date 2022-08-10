@@ -57,11 +57,16 @@ private:
     void addToUserFunctions(const std::string& name, const ASTNode* definition);
 
     void read();
-    void sqrt(const Literal* argument);
-    void head(const Literal* argument);
-    void tail(const Literal* argument);
-    void length(const Literal* argument);
-    void list(const Literal* argument);
+
+    void sqrt(const ASTUnaryFunctionNode* node);
+    void head(const ASTUnaryFunctionNode* node);
+    void tail(const ASTUnaryFunctionNode* node);
+    void length(const ASTUnaryFunctionNode* node);
+    void list(const ASTUnaryFunctionNode* node);
+    void write(const ASTUnaryFunctionNode* node);
+    void toInt(const ASTUnaryFunctionNode* node);
+
+    void concat(const ASTBinaryFunctionNode* node);
 
     //! FUNCTIONS FOR IMPLEMENTING THE VISITOR PATTERN
 

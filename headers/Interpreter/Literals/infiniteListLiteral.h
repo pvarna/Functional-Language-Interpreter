@@ -17,4 +17,5 @@ struct InfiniteListLiteral : public ListLiteral
     virtual Literal* head() const override;
     virtual InfiniteListLiteral* tail() const override;
     virtual int length() const override;
+    virtual bool isInfinite() const override;
 };

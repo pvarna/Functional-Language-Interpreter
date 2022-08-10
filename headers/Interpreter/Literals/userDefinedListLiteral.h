@@ -23,4 +23,5 @@ public:
     virtual Literal* head() const override;
     virtual UserDefinedListLiteral* tail() const override;
     virtual int length() const override;
+    virtual bool isInfinite() const override;
 };
