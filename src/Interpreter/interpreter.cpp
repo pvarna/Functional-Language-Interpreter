@@ -2,14 +2,22 @@
 #include "utils.h"
 #include "wholeNumberLiteral.h"
 #include "wholeNumberToken.h"
+#include "argumentToken.h"
 #include "fractionalNumberLiteral.h"
 #include "fractionalNumberToken.h"
 #include "userDefinedListLiteral.h"
 #include "functionNameToken.h"
 #include "infiniteListLiteral.h"
 #include "concatenatedListLiteral.h"
+#include "finiteListLiteral.h"
 #include <iostream>
 #include <cmath>
+
+const std::unordered_set<std::string> Interpreter::SAVED_FUNCTIONS = 
+{
+    "eq", "le", "nand", "length", "head", "tail", "list", "concat",
+    "if", "read", "write", "int", "add", "sub", "mul", "div", "mod", "sqrt"
+};
 
 void Interpreter::deallocate()
 {
@@ -27,10 +35,18 @@ void Interpreter::deallocate()
     }
 
     this->userArguments.clear();
+
+    this->offset = 0;
 }
+
+Interpreter::Interpreter() : offset(0) {}
 
 Interpreter::~Interpreter()
 {
+    for (std::pair<std::string, const ASTNode*> current : this->userFunctions)
+    {
+        delete current.second;
+    }
     this->deallocate();
 }
 
@@ -90,6 +106,9 @@ void Interpreter::visit(const ASTNode* node)
         break;
     case TokenType::FUNCTION_NAME:
         this->visitFunction(node);
+        break;
+    case TokenType::ARGUMENT:
+        this->visitArgument(node);
         break;
     default:
         throw std::runtime_error("Not implemented yet");
@@ -155,6 +174,18 @@ void Interpreter::visitFunction(const ASTNode* node)
     {
         this->visitBinaryFunction(dynamic_cast<const ASTBinaryFunctionNode*>(node));
     }
+    else if (typeid(*node) == typeid(ASTTernaryFunctionNode))
+    {
+        this->visitTernaryFunction(dynamic_cast<const ASTTernaryFunctionNode*>(node));
+    }
+    else if (typeid(*node) == typeid(ASTN_aryFunctionNode))
+    {
+        this->visitN_aryFunction(dynamic_cast<const ASTN_aryFunctionNode*>(node));
+    }
+    else if (typeid(*node) == typeid(ASTUserFunctionNode))
+    {
+        this->visitUserFunction(dynamic_cast<const ASTUserFunctionNode*>(node));
+    }
 }
 
 void Interpreter::visitFunctionWithoutArguments(const ASTNode* node)
@@ -173,7 +204,7 @@ void Interpreter::visitFunctionWithoutArguments(const ASTNode* node)
     }
     else
     {
-        throw std::runtime_error("Unknown function name");
+        throw std::runtime_error("Unknown function name: " + functionName);
     }
 }
 
@@ -206,12 +237,24 @@ void Interpreter::visitUnaryFunction(const ASTUnaryFunctionNode* node)
 
     if (this->userFunctions.count(functionName) != 0)
     {
+        this->visit(node->argument);
+
+        int difference = this->userArguments.size() - this->offset;
+        this->offset = this->userArguments.size();
+
         const Literal* top = this->visitedLiterals.top();
         this->visitedLiterals.pop();
 
         this->userArguments.push_back(top->clone());
-        this->visit(this->userFunctions[functionName]);
+        const ASTNode* definition = this->userFunctions.at(functionName);
+
+        this->visit(definition);
         delete top;
+
+        this->offset -= difference;
+        const Literal* back = this->userArguments.back();
+        this->userArguments.pop_back();
+        delete back;
     }
     else if (functionName == "sqrt")
     {
@@ -243,7 +286,7 @@ void Interpreter::visitUnaryFunction(const ASTUnaryFunctionNode* node)
     }
     else
     {
-        throw std::runtime_error("Unknown function name");
+        throw std::runtime_error("Unknown function name: " + functionName);
     }
 }
 
@@ -440,6 +483,9 @@ void Interpreter::visitBinaryFunction(const ASTBinaryFunctionNode* node)
         this->visit(node->firstArgument);
         this->visit(node->secondArgument);
 
+        int difference = this->userArguments.size() - this->offset;
+        this->offset = this->userArguments.size();
+
         const Literal* second = this->visitedLiterals.top();
         this->visitedLiterals.pop();
         const Literal* first = this->visitedLiterals.top();
@@ -447,9 +493,19 @@ void Interpreter::visitBinaryFunction(const ASTBinaryFunctionNode* node)
 
         this->userArguments.push_back(first->clone());
         this->userArguments.push_back(second->clone());
-        this->visit(this->userFunctions[functionName]);
+        const ASTNode* definition = this->userFunctions.at(functionName);
+
+        this->visit(definition);
         delete first;
         delete second;
+
+        this->offset -= difference;
+        const Literal* back = this->userArguments.back();
+        this->userArguments.pop_back();
+        delete back;
+        back = this->userArguments.back();
+        this->userArguments.pop_back();
+        delete back; 
     }
     else if (functionName == "concat")
     {
@@ -479,7 +535,7 @@ void Interpreter::visitBinaryFunction(const ASTBinaryFunctionNode* node)
     }
     else
     {
-        throw std::runtime_error("Unknown function name");
+        throw std::runtime_error("Unknown function name: " + functionName);
     }
 }
 
@@ -723,4 +779,232 @@ void Interpreter::binaryArithmethic(const ASTBinaryFunctionNode* node, const std
     this->visitedLiterals.push(Literal::of(result));
     delete firstArgument;
     delete secondArgument;
+}
+
+void Interpreter::visitTernaryFunction(const ASTTernaryFunctionNode* node)
+{
+    const FunctionNameToken* token = dynamic_cast<const FunctionNameToken*>(node->token);
+
+    std::string functionName = token->name;
+
+    if (this->userFunctions.count(functionName) != 0)
+    {
+        this->visit(node->firstArgument);
+        this->visit(node->secondArgument);
+        this->visit(node->thirdArgument);
+
+        int difference = this->userArguments.size() - this->offset;
+        this->offset = this->userArguments.size();
+
+        const Literal* third = this->visitedLiterals.top();
+        this->visitedLiterals.pop();
+        const Literal* second = this->visitedLiterals.top();
+        this->visitedLiterals.pop();
+        const Literal* first = this->visitedLiterals.top();
+        this->visitedLiterals.pop();
+
+        this->userArguments.push_back(first->clone());
+        this->userArguments.push_back(second->clone());
+        this->userArguments.push_back(third->clone());
+        this->visit(this->userFunctions[functionName]);
+        delete first;
+        delete second;
+        delete third;
+
+        this->offset -= difference;
+        const Literal* back = this->userArguments.back();
+        this->userArguments.pop_back();
+        delete back;
+        back = this->userArguments.back();
+        this->userArguments.pop_back();
+        delete back; 
+        back = this->userArguments.back();
+        this->userArguments.pop_back();
+        delete back; 
+    }
+    else if (functionName == "list")
+    {
+        this->list(node);
+    }
+    else if (functionName == "if")
+    {
+        this->visitIf(node);
+    }
+    else
+    {
+        throw std::runtime_error("Unknown function name: " + functionName);
+    }
+}
+
+void Interpreter::list(const ASTTernaryFunctionNode* node)
+{
+    this->visit(node->firstArgument);
+
+    const Literal* firstArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+    double firstNumber;
+
+    try
+    {
+        firstNumber = Literal::valueOf(firstArgument);
+    }
+    catch(...)
+    {
+        delete firstArgument;
+        throw std::runtime_error("Expected three numbers for the \'list\' function");
+    }
+
+    this->visit(node->secondArgument);
+
+    const Literal* secondArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+    double secondNumber;
+
+    try
+    {
+        secondNumber = Literal::valueOf(secondArgument);
+    }
+    catch(...)
+    {
+        delete firstArgument;
+        delete secondArgument;
+        throw std::runtime_error("Expected three numbers for the \'list\' function");
+    }
+
+    this->visit(node->thirdArgument);
+
+    const Literal* thirdArgument = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+    double thirdNumber;
+
+    try
+    {
+        thirdNumber = Literal::valueOf(thirdArgument);
+    }
+    catch(...)
+    {
+        delete firstArgument;
+        delete secondArgument;
+        delete thirdArgument;
+        throw std::runtime_error("Expected three numbers for the \'list\' function");
+    }
+
+    if (thirdArgument->type != LiteralType::WHOLE_NUMBER)
+    {
+        delete firstArgument;
+        delete secondArgument;
+        delete thirdArgument;
+        throw std::runtime_error("Expected a whole number as a third parameterfor the \'list\' function");
+    }
+
+    this->visitedLiterals.push(new FiniteListLiteral(firstNumber, secondNumber, thirdNumber));
+    delete firstArgument;
+    delete secondArgument;
+    delete thirdArgument;
+}
+
+void Interpreter::visitIf(const ASTTernaryFunctionNode* node)
+{
+    this->visit(node->firstArgument);
+
+    const Literal* condition = this->visitedLiterals.top();
+    this->visitedLiterals.pop();
+
+    bool result = condition->toBool();
+    delete condition;
+
+    result ? this->visit(node->secondArgument) : 
+             this->visit(node->thirdArgument);
+}
+
+void Interpreter::visitN_aryFunction(const ASTN_aryFunctionNode* node)
+{
+    const FunctionNameToken* token = dynamic_cast<const FunctionNameToken*>(node->token);
+
+    std::string functionName = token->name;
+
+    if (this->userFunctions.count(functionName) != 0)
+    {
+        std::vector<const Literal*> arguments;
+
+        for (const ASTNode* current : node->arguments)
+        {
+            try
+            {
+                this->visit(current);
+
+                const Literal* top = this->visitedLiterals.top();
+                this->visitedLiterals.pop();
+                arguments.push_back(top);
+                this->userArguments.push_back(top->clone());
+            }
+            catch(...)
+            {
+                for (const Literal* literal : arguments)
+                {
+                    delete literal;
+                }
+                arguments.clear();
+                throw;
+            }   
+        }
+
+        int difference = this->userArguments.size() - node->arguments.size() - this->offset;
+        this->offset = this->userArguments.size() - node->arguments.size();
+
+        this->visit(this->userFunctions[functionName]);
+
+        int argumentsSize = arguments.size();
+        for (const Literal* literal : arguments)
+        {
+            delete literal;
+        }
+        arguments.clear();
+
+        for (int i = 0; i < argumentsSize; ++i)
+        {
+            const Literal* back = this->userArguments.back();
+            this->userArguments.pop_back();
+            delete back;
+        }
+    }
+    else
+    {
+        throw std::runtime_error("Unknown function name: " + functionName);
+    }
+}
+
+void Interpreter::visitUserFunction(const ASTUserFunctionNode* node)
+{
+    const FunctionNameToken* token = dynamic_cast<const FunctionNameToken*>(node->token);
+
+    if (Interpreter::SAVED_FUNCTIONS.count(token->name) != 0)
+    {
+        throw std::runtime_error("Cannot declare function with the saved name \'"  + token->name + "\'");
+    }
+
+    int result = 0;
+    if (this->userFunctions.count(token->name) != 0)
+    {
+        delete this->userFunctions[token->name];
+        result = 1;
+    }
+
+    this->userFunctions[token->name] = node->definition->clone();
+
+    this->visitedLiterals.push(new WholeNumberLiteral(result));
+}
+
+void Interpreter::visitArgument(const ASTNode* node)
+{
+    const ArgumentToken* token = dynamic_cast<const ArgumentToken*>(node->token);
+
+    if (token->index >= this->userArguments.size())
+    {
+        std::runtime_error("Too few arguments");
+    }
+
+    const Literal* toCopy = this->userArguments[token->index];
+
+    this->visitedLiterals.push(this->userArguments[token->index + this->offset]->clone());     
 }

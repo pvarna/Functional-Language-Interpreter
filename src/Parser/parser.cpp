@@ -72,6 +72,10 @@ ASTNode* Parser::list()
                 toAdd = this->function();
                 break;
 
+            case TokenType::ARGUMENT:
+                toAdd = new ASTNode(*it);
+                break;
+
             default:
                 throw IllegalSyntaxException("Expected number, list or function call", this->text);
             }

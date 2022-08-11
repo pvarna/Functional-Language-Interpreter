@@ -43,7 +43,7 @@ std::string ConcatenatedListLiteral::toString() const
 {
     std::string result = first->toString();
     result.pop_back();
-    if (second->length() != 0)
+    if (first->length() != 0 && second->length() != 0)
     {
         result += " ";
     }
@@ -69,9 +69,9 @@ Literal* ConcatenatedListLiteral::head() const
 
 ListLiteral* ConcatenatedListLiteral::tail() const
 {
-    if (this->first->length() > 0)
+    if (this->first->length() == 0)
     {
-        return this->first->tail();
+        return this->second->tail();
     }
 
     ListLiteral* firstTail = this->first->tail();

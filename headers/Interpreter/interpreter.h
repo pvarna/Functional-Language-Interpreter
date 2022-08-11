@@ -11,9 +11,11 @@
 #include "ASTUnaryFunctionNode.h"
 #include "ASTBinaryFunctionNode.h"
 #include "ASTTernaryFunctionNode.h"
+#include "ASTN_aryFunctionNode.h"
 #include "ASTUserFunctionNode.h"
 #include "literal.h"
 #include <unordered_map>
+#include <unordered_set>
 #include <stack>
 #include <list>
 
@@ -23,10 +25,13 @@
 class Interpreter
 {
 private:
+    static const std::unordered_set<std::string> SAVED_FUNCTIONS;
+
     std::stack<const Literal*> visitedLiterals; //!< stores the already visited literals
     std::vector<const Literal*> userArguments; //!< stores the user arguments for the user-defined functions
     std::unordered_map<std::string, const ASTNode*> userFunctions; //!< stores the user-defined functions and their definitions
-
+    int offset;
+    
     //! Helper function for deallocating the allocated memory for the literals
     void deallocate();
 
@@ -50,6 +55,9 @@ private:
     void list(const ASTBinaryFunctionNode* node);
     void binaryArithmethic(const ASTBinaryFunctionNode* node, const std::string& functionName);
 
+    void list(const ASTTernaryFunctionNode* node);
+    void visitIf(const ASTTernaryFunctionNode* node);
+
     //! FUNCTIONS FOR IMPLEMENTING THE VISITOR PATTERN
 
     //! Function that determines which node should be visited at the moment
@@ -58,20 +66,19 @@ private:
     void visitWholeNumber(const ASTNode* node);
     void visitFractionalNumber(const ASTNode* node);
     void visitUserDefinedList(const ASTListNode* node);
-    void visitList(const ASTListNode* node);
-    void visitArgument(const ASTNode* node);
     void visitFunction(const ASTNode* node);
     void visitFunctionWithoutArguments(const ASTNode* node);
     void visitUnaryFunction(const ASTUnaryFunctionNode* node);
     void visitBinaryFunction(const ASTBinaryFunctionNode* node);
-    void visitIf(const ASTTernaryFunctionNode* node);
     void visitTernaryFunction(const ASTTernaryFunctionNode* node);
+    void visitN_aryFunction(const ASTN_aryFunctionNode* node);
     void visitUserFunction(const ASTUserFunctionNode* node);
+    void visitArgument(const ASTNode* node);
 
 public:
 
     //! Default constructor
-    Interpreter() = default;
+    Interpreter();
 
     //! Deleted copy constructor
     Interpreter(const Interpreter& other) = delete;

@@ -1,0 +1,2 @@
+fib -> if(eq(#0,0),0,if(eq(#0,1),1,add(fib(sub(#0,1)),fib(sub(#0,2)))))
+fact -> if(eq(#0,1),1,mul(#0,fact(sub(#0,1))))
