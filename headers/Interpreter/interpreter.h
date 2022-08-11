@@ -30,16 +30,15 @@ private:
     std::stack<const Literal*> visitedLiterals; //!< stores the already visited literals
     std::vector<const Literal*> userArguments; //!< stores the user arguments for the user-defined functions
     std::unordered_map<std::string, const ASTNode*> userFunctions; //!< stores the user-defined functions and their definitions
-    int offset;
+    int offset; //!< helper integer for the recursive function calls
     
     //! Helper function for deallocating the allocated memory for the literals
     void deallocate();
 
-    //! Helper function for adding a new user-defined function
-    void addToUserFunctions(const std::string& name, const ASTNode* definition);
-
+    //! Functions without arguments
     void read();
 
+    //! Functions with one argument
     void sqrt(const ASTUnaryFunctionNode* node);
     void head(const ASTUnaryFunctionNode* node);
     void tail(const ASTUnaryFunctionNode* node);
@@ -48,6 +47,7 @@ private:
     void write(const ASTUnaryFunctionNode* node);
     void toInt(const ASTUnaryFunctionNode* node);
 
+    //! Functions with two arguments
     void concat(const ASTBinaryFunctionNode* node);
     void eq(const ASTBinaryFunctionNode* node);
     void le(const ASTBinaryFunctionNode* node);
@@ -55,8 +55,10 @@ private:
     void list(const ASTBinaryFunctionNode* node);
     void binaryArithmethic(const ASTBinaryFunctionNode* node, const std::string& functionName);
 
+    //! Functions with three arguments
     void list(const ASTTernaryFunctionNode* node);
     void visitIf(const ASTTernaryFunctionNode* node);
+
 
     //! FUNCTIONS FOR IMPLEMENTING THE VISITOR PATTERN
 
