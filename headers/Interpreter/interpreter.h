@@ -90,5 +90,5 @@ public:
     ~Interpreter();
 
     //! Main function for interpreting the AST
-    std::string interpret(const ASTNode* astTree, std::ostream& out);
+    std::string interpret(const ASTNode* astTree);
 };

@@ -20,5 +20,5 @@ public:
 
     static ListFunc& getIstance();
 
-    void run(std::ostream& out);
+    void run();
 };

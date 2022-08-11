@@ -47,8 +47,7 @@ target_include_directories(ListFunc PUBLIC headers/Exceptions
 add_executable(ConsoleApp main.cpp)
 target_link_libraries(ConsoleApp ListFunc)
 
-# add_executable(Tests test/lexerTests.cpp test/parserTests.cpp test/interpreterTests.cpp)
-add_executable(Tests test/lexerTests.cpp test/parserTests.cpp)
+add_executable(Tests test/lexerTests.cpp test/parserTests.cpp test/interpreterTests.cpp)
 target_link_libraries(Tests ListFunc)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

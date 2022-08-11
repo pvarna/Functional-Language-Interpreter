@@ -3,7 +3,7 @@
 
 int main ()
 {
-    ListFunc::getIstance().run(std::cout);
+    ListFunc::getIstance().run();
 
     return 0;
 }

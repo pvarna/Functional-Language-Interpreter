@@ -23,18 +23,18 @@ ListFunc& ListFunc::getIstance()
     return object;
 }
 
-void ListFunc::run(std::ostream& out)
+void ListFunc::run()
 {
     while (true)
     {
         std::string str;
 
-        out << "listFunc > ";
+        std::cout << "listFunc > ";
         std::getline(std::cin, str);
 
         if (str == "cls")
         {
-            out << std::endl;
+            std::cout << std::endl;
             break;
         }
 
@@ -48,7 +48,7 @@ void ListFunc::run(std::ostream& out)
         catch(std::exception& e)
         {
             deallocateResources(tokens);
-            out << e.what() << std::endl << std::endl;
+            std::cout << e.what() << std::endl << std::endl;
             continue;
         }
 
@@ -62,18 +62,18 @@ void ListFunc::run(std::ostream& out)
         catch(const std::exception& e)
         {
             deallocateResources(tokens);
-            out << e.what() << std::endl << std::endl;
+            std::cout << e.what() << std::endl << std::endl;
             continue;
         }
 
         try
         {
-            out << this->interpreter.interpret(ast, out) << std::endl << std::endl;
+            std::cout << this->interpreter.interpret(ast) << std::endl << std::endl;
         }
         catch(const std::exception& e)
         {
             deallocateResources(tokens, ast);
-            out << e.what() << std::endl << std::endl;
+            std::cout << e.what() << std::endl << std::endl;
             continue;
         }
 

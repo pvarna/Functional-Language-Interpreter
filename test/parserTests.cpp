@@ -19,15 +19,6 @@ void deallocate(std::vector<Token*>& tokens, ASTNode* tree = nullptr)
     }
 }
 
-TEST_CASE("Check empty AST")
-{
-    Lexer l("");
-    std::vector<Token*> tokens = l.tokenize();
-
-    Parser parser("", tokens);
-    REQUIRE(parser.parse() == nullptr);
-}
-
 TEST_CASE("Check AST with only one token")
 {
     SECTION("Whole Number")
@@ -230,23 +221,5 @@ TEST_CASE("Some illegal inputs")
         REQUIRE_THROWS(Parser(input, tokens).parse());
     
         deallocate(tokens);
-    }
-}
-
-TEST_CASE("TEST")
-{
-    SECTION("alo")
-    {
-        Lexer str("read()");
-        std::vector<Token*> tokens = str.tokenize();
-        REQUIRE(tokens.size() == 3);
-        
-        Parser parser("read()", tokens);
-        ASTNode* AST = parser.parse();
-    
-        std::cout << AST->toString() << std::endl;
-        std::cout << typeid(*AST).name() << std::endl;
-
-        deallocate(tokens, AST);
     }
 }

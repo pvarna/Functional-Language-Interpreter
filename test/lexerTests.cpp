@@ -136,9 +136,7 @@ TEST_CASE("Check for valid single tokens")
 TEST_CASE("Check empty input")
 {
     Lexer empty("");
-    std::vector<Token*> tokens = empty.tokenize();
-
-    REQUIRE(tokens.empty());
+    REQUIRE_THROWS(empty.tokenize());
 }
 
 TEST_CASE("Check some of the examples from the description")

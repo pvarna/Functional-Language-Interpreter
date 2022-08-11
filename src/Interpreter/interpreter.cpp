@@ -50,7 +50,7 @@ Interpreter::~Interpreter()
     this->deallocate();
 }
 
-std::string Interpreter::interpret(const ASTNode* astTree, std::ostream& out)
+std::string Interpreter::interpret(const ASTNode* astTree)
 {
     this->deallocate();
 
