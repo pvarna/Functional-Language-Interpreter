@@ -1,2 +1,14 @@
 fib -> if(eq(#0,0),0,if(eq(#0,1),1,add(fib(sub(#0,1)),fib(sub(#0,2)))))
-fact -> if(eq(#0,1),1,mul(#0,fact(sub(#0,1))))
+fact -> if(eq(#0,0),1,mul(#0,fact(sub(#0,1))))
+
+divisors -> concat([2], list(3, 1, sub(int(sqrt(#0)),2)))
+containsDevisors -> if(length(#0), if(mod(#1,head(#0)), containsDevisors(tail(#0), #1), 1),0)
+isPrime -> if(eq(#0,1),0,if(eq(#0,2),1,not(containsDevisors(divisors(#0), #0))))
+filterPrimes -> if(length(#0),if(isPrime(head(#0)),concat([head(#0)], filterPrimes(tail(#0))),filterPrimes(tail(#0))),[])
+
+// Credit: Luben Georgiev
+min -> if(length(#0), if(nand(nand(length(#1), le(head(#0), head(#1))), 1), min(tail(#0), concat([head(#0)], #1)), min(tail(#0), concat(#1, [head(#0)]))), #1)
+sort -> if(length(#0), concat([head(min(#0, []))], sort(tail(min(#0, [])))), [])
+
+
+
