@@ -43,7 +43,7 @@ std::string ConcatenatedListLiteral::toString() const
 {
     std::string result = first->toString();
     result.pop_back();
-    if (first->length() != 0 && second->length() != 0)
+    if (first->length() != 0 && (second->isInfinite() || second->length() != 0))
     {
         result += " ";
     }
