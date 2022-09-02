@@ -61,7 +61,7 @@ void ListFunc::run()
         }
         catch(const std::exception& e)
         {
-            deallocateResources(tokens);
+            deallocateResources(tokens, ast);
             std::cout << e.what() << std::endl << std::endl;
             continue;
         }
